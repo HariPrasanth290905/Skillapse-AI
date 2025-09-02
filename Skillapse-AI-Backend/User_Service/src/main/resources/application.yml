@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: User_Service #Application Name
+
+  #ADMIN-SERVER REGISTER
+  boot:
+    admin:
+      client:
+        url: 'http://localhost:1111'
+
+#Expose All Actuator Endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

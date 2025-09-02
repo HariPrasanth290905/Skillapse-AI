@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+html,
+body {
+  width: 100%;
+  background-color: black;
+  color: white;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+@layer components {
+  .flex-center {
+    @apply flex justify-between items-center p-3.5 mx-5;
+  }
+
+  nav {
+    @apply border-b border-gray-700;
+  }
+
+  .flex-center img {
+    @apply max-w-[60px] rounded-full border-4 border-pink-500;
+  }
+
+  .flex-center h1 {
+    @apply font-semibold text-3xl;
+  }
+
+  .flex-center > div {
+    @apply flex gap-5 justify-center items-center;
+  }
+
+  .flex-center > div > div {
+    @apply flex flex-col gap-0 items-end;
+  }
+
+  .flex-center i {
+    @apply text-gray-400;
+  }
+}
