@@ -1,10 +1,15 @@
-import { Sidebar } from "lucide-react";
 import Nav from "./Dash_Components/Nav";
+import Sidebar from "./Dash_Components/Sidebar";
+import Welcome from "./Dash_Components/Welcome";
 
 function Dashboard() {
   return (
     <>
-    <Nav/>
+    <div className="dash">
+      <Sidebar />
+      <Nav />
+    </div>
+    <Welcome/>
     </>
   );
 }

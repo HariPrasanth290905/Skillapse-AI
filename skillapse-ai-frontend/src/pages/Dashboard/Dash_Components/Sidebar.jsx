@@ -8,25 +8,18 @@ import {
   ListItemText,
 } from "@mui/material";
 import {
-  HomeIcon,
-  LayoutDashboardIcon,
   MenuIcon,
-  SettingsIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import menuItems from "./dash";
 
 function Sidebar() {
   const [open, setOpen] = useState(false);
 
   const toggleDrawer = (state) => () => setOpen(state);
 
-  const menuItems = [
-    { text: "Dashboard", icon: <LayoutDashboardIcon />, path: "/" },
-    { text: "Home", icon: <HomeIcon />, path: "/home" },
-    { text: "Settings", icon: <SettingsIcon />, path: "/settings" },
-  ];
-
+  
   return (
     <>
       <IconButton onClick={toggleDrawer(true)} edge="start" color="inherit">
@@ -38,7 +31,17 @@ function Sidebar() {
         open={open}
         onClose={toggleDrawer(false)}
         variant="temporary"
+        slotProps={{
+          paper: {
+            sx: {
+              bgcolor: "#1e1e1e",
+              color: "#fff",
+            },
+          },
+        }}
       >
+       <div className="dash-content">
+         <h1>SKILLAPSE AI</h1>
         <List sx={{ width: 250 }}>
           {menuItems.map((item, index) => (
             <ListItem key={index} disablePadding>
@@ -53,6 +56,7 @@ function Sidebar() {
             </ListItem>
           ))}
         </List>
+       </div>
       </Drawer>
     </>
   );
