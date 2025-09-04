@@ -1,7 +1,8 @@
-import { BarChart3, LucideChartBar } from "lucide-react";
+import { BarChart3 } from "lucide-react";
 import Progressbar from "./Progressbar";
 
 function Analytics() {
+  
   return (
     <section id="analytics">
       <div className="a-title">
@@ -30,7 +31,7 @@ function Analytics() {
           <p>Matching Efficiency</p>
           <p>0%</p>
         </div>
-        <Progressbar value={70}/>
+        <Progressbar value={70} />
       </div>
     </section>
   );

@@ -89,7 +89,8 @@ body {
   }
 
   #welcome button {
-    @apply rounded-xl px-15 py-3 text-xl font-semibold cursor-pointer relative border-4 border-transparent;
+    @apply rounded-xl px-15 py-3 text-xl font-semibold cursor-pointer relative border-4 border-transparent hover:shadow-[0_0_40px_rgba(255,45,131,0.45)]
+ ;
     background-image: linear-gradient(rgb(0, 0, 0), rgb(0, 0, 0)),
       linear-gradient(to right, #ec4899, #a855f7, #0ea5e9);
     background-origin: border-box;
@@ -187,6 +188,34 @@ body {
 
 .dash-analytics {
   @apply flex gap-10 m-10;
+}
+/* Cta Section  */
+#cta{
+  @apply mx-auto w-full px-10 py-5 text-gray-200
+}
+
+.cta-sec{
+  @apply rounded-2xl p-10 py-15 border-1 border-gray-700 bg-gray-900
+}
+.cta-title{
+  @apply mx-auto max-w-3xl text-center
+}
+.cta-text{
+  @apply mx-auto mb-8 max-w-2xl text-lg text-gray-300
+}
+.cta-butt-sec{
+  @apply flex flex-col items-center gap-4 sm:flex-row sm:justify-center
+}
+.cta-button {
+  @apply inline-flex items-center gap-3 rounded-xl px-5 py-3 text-sm font-semibold;
+}
+
+.cta-button-pink {
+  @apply shadow-[0_0_25px_rgba(236,72,153,0.75)];
+}
+
+.cta-button-sky {
+  @apply shadow-[0_0_25px_rgba(14,165,233,0.75)];
 }
 
 }
