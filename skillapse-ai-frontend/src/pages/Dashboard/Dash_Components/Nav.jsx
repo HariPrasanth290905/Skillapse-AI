@@ -1,7 +1,12 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { Bell } from "lucide-react";
+import { useState } from "react";
 function Nav() {
+
+  const [name,setName] = useState('User');
+  const [role,setRole] = useState('AI Developer')
+
   useGSAP(() => {
     gsap.from('.head',{
       x:-50,
@@ -16,9 +21,9 @@ function Nav() {
       <div>
         <Bell />
         <div>
-          <p>Irah</p>
+          <p>{name}</p>
           <i>
-            <span className="text-gray-400">AI Developer</span>
+            <span className="text-gray-400">{role}</span>
           </i>
         </div>
         <img src="natori.jpg" alt="pfp" />
