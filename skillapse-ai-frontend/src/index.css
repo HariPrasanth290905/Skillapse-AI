@@ -40,7 +40,7 @@ body {
     @apply font-semibold text-3xl;
   }
 
-  .flex-center > div {
+  .flex-center div {
     @apply flex gap-5 justify-center items-center;
   }
 
@@ -48,35 +48,145 @@ body {
     @apply flex flex-col gap-0 items-end;
   }
 
-  .flex-center i {
+  .flex-center > i {
     @apply text-gray-400;
   }
 
   /* Not Found */
-  .not-found{
-    @apply flex justify-center items-center h-screen w-full 
+  .not-found {
+    @apply flex justify-center items-center h-screen w-full;
   }
-  .not-found img{
-    @apply max-w-200
+  .not-found img {
+    @apply max-w-200;
   }
 
   /* Welcome Section */
-  #welcome{
-    @apply flex flex-col w-full items-center gap-8 p-10 h-dvh justify-center
+  #welcome {
+    @apply flex flex-col w-full items-center gap-8 p-10 h-dvh justify-center relative overflow-hidden;
+    background: radial-gradient(ellipse at center, #1b2735 0%, #090a0f 90%);
+  }
+  #welcome h1,
+  #welcome p,
+  #welcome button {
+    position: relative;
+    z-index: 10;
   }
 
-  #welcome h1{
-    @apply text-6xl font-extrabold bg-gradient-to-r from-pink-500 via-purple-500 to-sky-500 bg-clip-text text-transparent ;
+  #welcome h1 {
+    @apply text-6xl font-extrabold bg-gradient-to-r from-pink-500 via-purple-500 to-sky-500 bg-clip-text text-transparent;
   }
 
-  #welcome p{
-    @apply  text-center text-[20px] text-gray-400 w-10/12
+  #welcome p {
+    @apply text-center text-[20px] text-gray-400 w-10/12;
+  }
+  #welcome div {
+    @apply flex items-center gap-5;
+  }
+  /* Bot Icon */
+  #welcome .bot {
+    @apply text-pink-500;
+    animation: spin 1.5s linear;
   }
 
   #welcome button {
-  @apply rounded-xl px-15 py-3 text-xl font-semibold cursor-pointer relative border-4 border-transparent;
-  background-image: linear-gradient(rgb(0, 0, 0), rgb(0, 0, 0)), linear-gradient(to right, #ec4899, #a855f7, #0ea5e9);
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
+    @apply rounded-xl px-15 py-3 text-xl font-semibold cursor-pointer relative border-4 border-transparent;
+    background-image: linear-gradient(rgb(0, 0, 0), rgb(0, 0, 0)),
+      linear-gradient(to right, #ec4899, #a855f7, #0ea5e9);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+  }
+
+  /* Cards */
+  #cards {
+  @apply flex m-10 gap-[20px] flex-wrap;
 }
+
+#cards div {
+  @apply flex flex-col gap-5 rounded-2xl border border-gray-700 bg-gray-900 w-[372px] py-10 pl-5;
+}
+
+#cards div h1 {
+  @apply text-2xl font-semibold;
+}
+
+#cards div p {
+  @apply text-lg text-gray-400;
+}
+
+/* Core section */
+
+/* Core left */
+#core {
+  @apply flex flex-col p-10 gap-4 border rounded-2xl w-1/2 border-gray-700 bg-gray-900;
+}
+
+#core .core-title {
+  @apply flex gap-4 text-2xl font-semibold items-center;
+}
+
+.core-list {
+  @apply flex flex-col gap-5 list-disc marker:text-sky-500 pl-5;
+}
+.core-list h3 {
+  @apply text-xl;
+}
+.core-list span {
+  @apply text-gray-400;
+}
+
+/* Core right */
+#analytics {
+  @apply flex flex-col border rounded-2xl border-gray-700 bg-gray-900 p-10 gap-7 w-1/2;
+}
+
+.a-title {
+  @apply flex gap-3 text-2xl items-center font-semibold;
+}
+
+/* Active Users Analytics */
+.a-match {
+  @apply flex flex-col items-center w-full;
+}
+.a-match h1 {
+  @apply text-5xl font-bold text-pink-500;
+}
+.a-match span {
+  @apply text-gray-400;
+}
+
+/* Rates Analytics */
+.rates {
+  @apply flex justify-around;
+}
+.rates div {
+  @apply flex flex-col items-center;
+}
+.rates div:first-child h1 {
+  @apply text-4xl font-bold text-sky-500;
+}
+.rates div:first-child span {
+  @apply text-gray-400;
+}
+.rates div:nth-child(2) h1 {
+  @apply text-4xl font-bold text-purple-500;
+}
+.rates div:nth-child(2) span {
+  @apply text-gray-400;
+}
+
+/* Progress efficiency */
+.eff {
+  @apply flex flex-col justify-center bg-black gap-3 p-4 rounded-2xl;
+}
+.eff-head {
+  @apply flex justify-between;
+}
+.a-bar {
+  @apply bg-gradient-to-r from-pink-500 via-purple-500 to-sky-500 rounded-full h-3;
+}
+
+.dash-analytics {
+  @apply flex gap-10 m-10;
+}
+
 }

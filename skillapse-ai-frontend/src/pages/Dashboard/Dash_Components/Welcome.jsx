@@ -1,7 +1,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { SplitText } from "gsap/all";
-
+import { Bot } from "lucide-react";
 function Welcome() {
   useGSAP(() => {
     const content = new SplitText("#welcome p", {
@@ -13,6 +13,7 @@ function Welcome() {
       duration: 0.5,
       stagger: 0.3,
       delay: 0.2,
+      ease:'power2.inOut'
     });
     gsap.from("#welcome button", {
       opacity: 0,
@@ -28,7 +29,10 @@ function Welcome() {
 
   return (
     <section id="welcome">
-      <h1>Welcome to Skillapse AI</h1>
+      <div>
+        <Bot size={60} className="bot"/>
+        <h1>Welcome to Skillapse AI</h1>
+      </div>
       <p>
         SkillMatch Al revolutionizes talent acquisition by leveraging advanced
         machine learning algorithms to match candidates with job opportunities
