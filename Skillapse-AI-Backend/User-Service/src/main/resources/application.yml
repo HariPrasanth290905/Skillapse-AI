@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: user-service
+
+  config:
+    import: optional:configserver:http://localhost:8090/
+
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/skillapse_user
+#    username: root
+#    password: izel2002
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
