@@ -2,18 +2,25 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { SplitText } from "gsap/all";
 import { Bot } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 function Welcome() {
+
+  const navigate = useNavigate();
+  const handleButton = () => {
+    navigate('#')
+  };
+
   useGSAP(() => {
     const content = new SplitText("#welcome p", {
       type: "lines",
     });
+    // Animations
     gsap.from(content.lines, {
       x: -100,
       opacity: 0,
       duration: 0.5,
       stagger: 0.3,
       delay: 0.2,
-      ease:'power2.inOut'
     });
     gsap.from("#welcome button", {
       opacity: 0,
@@ -30,7 +37,7 @@ function Welcome() {
   return (
     <section id="welcome">
       <div>
-        <Bot size={60} className="bot"/>
+        <Bot size={60} className="bot" />
         <h1>Welcome to Skillapse AI</h1>
       </div>
       <p>
@@ -40,7 +47,7 @@ function Welcome() {
         platform analyzes resumes, job descriptions, and candidate profiles to
         provide precise matching recommendations
       </p>
-      <button>Find Partners</button>
+      <button onClick={handleButton}>Find Partners</button>
     </section>
   );
 }

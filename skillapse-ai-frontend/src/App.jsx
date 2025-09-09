@@ -11,13 +11,15 @@ import Notfound from "./Notfound";
 import Test from "./Test/Test";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/all";
+import Signup from "./pages/Signup/Signup";
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<Master />}>
         <Route index element={<Dashboard />} />
+        <Route path="signup" element={<Signup />} />
         <Route path="test" element={<Test />} />
         <Route path="*" element={<Notfound />} />
       </Route>
