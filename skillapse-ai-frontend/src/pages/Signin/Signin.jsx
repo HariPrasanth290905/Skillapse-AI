@@ -1,14 +1,34 @@
+import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Signin() {
-
-  const [user,setUser] = useState({
-    name:'',
-    password:''
+  const [user, setUser] = useState({
+    name: "",
+    password: "",
   });
 
   const navigate = useNavigate();
+
+  const handleSignin = async (e) => {
+    e.preventDefault();
+    axios
+      .post("http://localhost:8080/auth/signIn", user)
+      .then((res) => {
+        console.log(res.data);
+        navigate('/dashboard');
+      })
+      .catch((err) => {
+        console.error(err);
+        // Show error to user
+      });
+  };
+
+  // Google login
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+  };
+
   return (
     <div id="signin">
       <div className="box">
@@ -17,31 +37,49 @@ function Signin() {
           <h1>Welcome to Skillapse</h1>
           <p>Sign in to continue</p>
         </div>
-        <div className="google">Google</div>
-        <form className="up-enter">
+
+        {/* Google login */}
+        <div className="cursor-pointer" onClick={handleGoogleLogin}>
+          Google
+        </div>
+
+        {/* Traditional login */}
+        <form className="up-enter" onSubmit={handleSignin}>
           <div>
             <label htmlFor="username">Username</label>
-            <input type="text" id="username" name="username" value={user.name}/>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={user.name}
+              onChange={(e) => setUser({ ...user, name: e.target.value })}
+            />
           </div>
           <div>
             <label htmlFor="password">Password</label>
-            <input type="password" id="password" name="password" 
-            value={user.password}
-            onChange={setUser}
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={user.password}
+              onChange={(e) => setUser({ ...user, password: e.target.value })}
             />
           </div>
-        </form>
-        <div className="sign-wrap">
-          <button type="submit" className="myButton">
-            Sign in
+
+          <button className="myButton" type="submit">
+            Sign In
           </button>
-          <div className="sign-foot">
-            <p>Forgot password?</p>
-            <p>
-              Need an account?
-              <a onClick={()=>{navigate('/signup')}} className="text-gray-300 hover:text-white mx-0.5 cursor-pointer">Sign up</a>
-            </p>
-          </div>
+        </form>
+        <div className="sign-foot">
+          <a href="#" className="sign-wrap">
+            Forgot password?
+          </a>
+          <p>
+            Need an account?
+            <a href="#" className="sign-wrap">
+              Sign up
+            </a>
+          </p>
         </div>
       </div>
     </div>

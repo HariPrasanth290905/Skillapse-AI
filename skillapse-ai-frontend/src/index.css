@@ -221,60 +221,53 @@ body {
 
   /* Sign in  */
   #signin {
-  @apply flex justify-center items-center h-screen;
-}
+    @apply flex justify-center items-center h-screen w-full;
+  }
 
-.box {
-  @apply flex flex-col justify-center items-center h-auto max-w-[40%] rounded-4xl border border-gray-400 p-5 overflow-hidden object-cover;
-}
+  .box {
+    @apply flex flex-col justify-center items-center h-auto max-w-5/12 rounded-4xl border border-gray-400 p-20 overflow-hidden object-cover;
+  }
 
-.google {
-  @apply border-b border-gray-400 w-[80%] text-center p-4 mb-5;
-}
+  .box .header {
+    @apply flex flex-col items-center gap-5;
+  }
 
-.box .header {
-  @apply flex flex-col items-center gap-3;
-}
+  .box img {
+    @apply w-[25%] rounded-full border-t-4 border-b-4 border-t-pink-500 border-b-sky-500;
+  }
 
-.box img {
-  @apply w-[25%] rounded-full border-t-4 border-b-4 border-t-pink-500 border-b-sky-500;
-}
+  #signin h1 {
+    @apply font-bold text-4xl;
+  }
 
-#signin h1 {
-  @apply font-bold text-4xl;
-}
+  #signin p {
+    @apply text-gray-400;
+  }
 
-#signin p {
-  @apply text-gray-400;
-}
+  .up-enter {
+    @apply flex flex-col justify-center items-center gap-5 w-10/12;
+  }
 
-.up-enter {
-  @apply flex flex-col justify-center gap-5 w-[70%];
-}
+  .up-enter > div {
+    @apply flex flex-col gap-4 w-full;
+  }
 
-.up-enter > div {
-  @apply flex flex-col gap-4;
-}
+  .up-enter > div input {
+    @apply border border-gray-400 rounded-2xl py-3 w-full;
+  }
 
-.up-enter > div input {
-  @apply border border-gray-400 rounded-2xl py-3 w-full;
-}
+  .up-enter label {
+    @apply text-xl font-semibold;
+  }
 
-.up-enter label {
-  @apply text-xl font-semibold;
-}
+  .myButton {
+    @apply flex px-20 py-3.5 border-3 border-pink-500 text-xl font-bold rounded-2xl cursor-pointer justify-center mt-5 w-4/5;
+  }
 
-.sign-wrap {
-  @apply flex flex-col items-center gap-5 p-10 w-[70%];
-}
-
-.myButton {
-  @apply flex px-20 py-3.5 border-3 border-pink-500 text-xl font-bold rounded-2xl cursor-pointer justify-center;
-}
-
-.sign-foot {
-  @apply flex justify-between w-full;
-}
-
-
+  .sign-foot {
+    @apply flex justify-between w-full mt-5;
+  }
+  .sign-wrap {
+    @apply text-gray-300 ml-1 hover:text-gray-200 cursor-pointer;
+  }
 }
