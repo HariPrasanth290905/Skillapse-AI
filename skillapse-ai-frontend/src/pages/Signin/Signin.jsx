@@ -4,19 +4,23 @@ import { useNavigate } from "react-router-dom";
 
 function Signin() {
   const [user, setUser] = useState({
-    name: "",
+    username: "",
     password: "",
   });
 
   const navigate = useNavigate();
 
   const handleSignin = async (e) => {
+    console.log(user);
     e.preventDefault();
     axios
       .post("http://localhost:8080/auth/signIn", user)
       .then((res) => {
         console.log(res.data);
-        navigate('/dashboard');
+        navigate("/verifyOtp", {
+          replace: true,
+          state: { email: res.data,username:user.username},
+        });
       })
       .catch((err) => {
         console.error(err);
@@ -52,7 +56,7 @@ function Signin() {
               id="username"
               name="username"
               value={user.name}
-              onChange={(e) => setUser({ ...user, name: e.target.value })}
+              onChange={(e) => setUser({ ...user, username: e.target.value })}
             />
           </div>
           <div>

@@ -224,6 +224,7 @@ body {
     @apply flex justify-center items-center h-screen w-full;
   }
 
+  /* Signin Box  */
   .box {
     @apply flex flex-col justify-center items-center h-auto max-w-5/12 rounded-4xl border border-gray-400 p-20 overflow-hidden object-cover;
   }
@@ -269,5 +270,21 @@ body {
   }
   .sign-wrap {
     @apply text-gray-300 ml-1 hover:text-gray-200 cursor-pointer;
+  }
+
+  /* Verify Page  */
+
+  .verify{
+    @apply flex flex-col justify-center items-center h-dvh
+  }
+
+  .verify .top{
+    @apply flex flex-col items-center gap-7
+  }
+  .otp{
+    @apply flex gap-10 my-10
+  }
+  .otp input{
+    @apply border w-10 h-10 rounded-md text-center font-semibold text-lg 
   }
 }

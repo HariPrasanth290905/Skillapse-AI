@@ -12,6 +12,7 @@ import Test from "./Test/Test";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/all";
 import Signup from "./pages/Signup/Signup";
+import VerifyOtp from "./pages/Verify/VerifyOtp";
 
 gsap.registerPlugin(ScrollTrigger);
 function App() {
@@ -20,6 +21,7 @@ function App() {
       <Route path="/" element={<Master />}>
         <Route index element={<Dashboard />} />
         <Route path="signup" element={<Signup />} />
+        <Route path="verifyOtp" element={<VerifyOtp />} />
         <Route path="test" element={<Test />} />
         <Route path="*" element={<Notfound />} />
       </Route>
