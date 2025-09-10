@@ -7,8 +7,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Otp {
-    private String email;
-    private String otp;
+public class LoginRequest {
     private String username;
+    private String password;
+    private String email;
 }

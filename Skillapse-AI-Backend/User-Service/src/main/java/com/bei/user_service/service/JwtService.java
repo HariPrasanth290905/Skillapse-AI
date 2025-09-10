@@ -1,4 +1,4 @@
-package com.bei.user_service.config;
+package com.bei.user_service.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -22,6 +22,7 @@ public class JwtService {
     private String SECRET_KEY;
 
     public String generateToken(String username) {
+        System.out.println("Generating token for user: " + username);
         Map<String, Object> claims = new HashMap<>();
 
         return Jwts.builder()
@@ -49,7 +50,7 @@ public class JwtService {
         final Claims claims = extractAllClaims(token);
         return claimResolver.apply(claims);
     }
-    //extracct all claims
+    //extract all claims
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getKey())

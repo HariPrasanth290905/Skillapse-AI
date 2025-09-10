@@ -5,10 +5,7 @@ import java.util.UUID;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -19,10 +16,12 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class BeiUsers {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(columnDefinition = "BINARY(16)")
     private UUID id;   // Generate Unique user ID
 
 
@@ -34,11 +33,14 @@ public class BeiUsers {
     private String email;
 
     @Column(nullable = false)
+    @ToString.Exclude
     private String password;
 
-   /* @Column(nullable = false)
-    private String role;*/
+    @Column(nullable = false)
+    private String role;
 
+    @Column(nullable = false)
+    private String position;
 
     @Column(length = 100)
     private String fullName;
@@ -75,4 +77,5 @@ public class BeiUsers {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
 }

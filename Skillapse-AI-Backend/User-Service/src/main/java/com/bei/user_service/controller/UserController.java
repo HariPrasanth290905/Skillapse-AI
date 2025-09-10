@@ -1,31 +1,55 @@
 package com.bei.user_service.controller;
 
+import com.bei.user_service.dto.UserDto;
 import com.bei.user_service.model.BeiUsers;
+
 import com.bei.user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
-    UserService userService;
-
-    @Value("${spring.datasource.username}")
-    String msg;
+    private UserService userService;
 
     @GetMapping("/")
-    String hello() {
-        return msg;
+    String home() {
+        return "Hello World!";
     }
 
-    @GetMapping("/signup")
-    ResponseEntity<BeiUsers> addUser(@RequestBody  BeiUsers beiUsers){
-        return ResponseEntity.ok(userService.addUser(beiUsers));
+    @GetMapping("/test")
+    String test() {
+        return "Successful";
+    }
+
+    @PostMapping("/update")
+    ResponseEntity<?> updateUser(@RequestBody BeiUsers beiUsers){
+        try {
+            return new ResponseEntity<>(userService.updateUser(beiUsers.getId(), beiUsers), HttpStatus.OK);
+        }
+        catch (Exception ex){
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/deleteAll")
+    ResponseEntity<?> deleteAllUser() {
+        userService.deleteAllUsers();
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+
+    @GetMapping("/getUser")
+    ResponseEntity<?> getUserByUsername(Authentication authentication) {
+        String username = authentication.getName();
+        UserDto user = userService.getUser(username);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
 }

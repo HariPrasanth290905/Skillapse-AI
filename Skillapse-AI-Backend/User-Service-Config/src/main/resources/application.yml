@@ -9,7 +9,7 @@ spring:
         git:
           uri: https://github.com/HariPrasanth290905/ConfigServer.git
           username: HariPrasanth290905
-          password: ${GIT_TOKEN}
+          password:
 
 server:
   port: 8090
