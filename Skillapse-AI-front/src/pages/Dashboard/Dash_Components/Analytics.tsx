@@ -1,13 +1,13 @@
 import { BarChart3 } from "lucide-react";
-import Progressbar from "./Progressbar";
 import { useState } from "react";
+import Progressbar from "../../../Components/Progressbar";
 
 function Analytics() {
 
-  const [activeUsers,setActiveUsers] = useState(0);
-  const [rating,setRating] = useState(0)
-  const [efficiency,setEfficiency]=useState(0);
-  
+  const [activeUsers, setActiveUsers] = useState(0);
+  const [rating, setRating] = useState(0)
+  const [efficiency, setEfficiency] = useState(0);
+
   return (
     <section id="analytics">
       <div className="a-title">
@@ -23,11 +23,11 @@ function Analytics() {
       <div className="rates">
         <div>
           <h1>0</h1>
-          <span>numbers lala</span>
+          <span>numbers.</span>
         </div>
         <div>
           <h1>{rating}/5</h1>
-          <span>numbers lala</span>
+          <span>numbers.</span>
         </div>
         {/* Row */}
       </div>
@@ -36,7 +36,7 @@ function Analytics() {
           <p>Matching Efficiency</p>
           <p>0%</p>
         </div>
-        <Progressbar value={efficiency} />
+        <Progressbar progress={efficiency} />
       </div>
     </section>
   );

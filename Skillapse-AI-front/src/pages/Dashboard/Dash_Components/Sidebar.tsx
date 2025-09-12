@@ -15,7 +15,7 @@ import { menuItems } from "./Dash";
 function Sidebar() {
   const [open, setOpen] = useState(false);
 
-  const toggleDrawer = (state) => () => setOpen(state);
+  const toggleDrawer = (state: boolean) => () => setOpen(state);
 
   return (
     <>
@@ -38,7 +38,7 @@ function Sidebar() {
         }}
       >
         <div className="dash-content">
-          <h1 className="pb-10">SKILLAPSE AI</h1>
+          <h1 className="pb-10 gradient-text">SKILLAPSE AI</h1>
           <List sx={{ width: 250 }}>
             {menuItems.map((item, index) => (
               <ListItem key={index} disablePadding>

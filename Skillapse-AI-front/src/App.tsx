@@ -1,21 +1,13 @@
-import {
-  createBrowserRouter,
-  createRoutesFromElements,
-  Route,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } from "react-router-dom";
 import Master from "./pages/Master";
 import Dashboard from "./pages/Dashboard/Dashboard";
-import "./App.css";
-import Notfound from "./Notfound";
-import Test from "./Test/Test";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/all";
-import Signup from "./pages/Signup/Signup";
-import VerifyOtp from "./pages/Verify/VerifyOtp";
 import Signin from "./pages/Signin/Signin";
+import VerifyOtp from "./pages/Verify/VerifyOtp";
+import Test from "./Test/Test";
+import Notfound from "./Notfound";
+import Signup from "./pages/Signup/Signup";
+import Profile from "./pages/Profile/Profile";
 
-gsap.registerPlugin(ScrollTrigger);
 function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -24,7 +16,9 @@ function App() {
         <Route path="signup" element={<Signup />} />
         <Route path="signin" element={<Signin />} />
         <Route path="verifyOtp" element={<VerifyOtp />} />
+        <Route path="profile" element={<Profile />} />
         <Route path="test" element={<Test />} />
+        
         <Route path="*" element={<Notfound />} />
       </Route>
     )

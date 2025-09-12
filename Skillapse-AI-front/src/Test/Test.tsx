@@ -7,7 +7,10 @@
 // import Signin from "../pages/Signin/Signin"
 // import Signup from "../pages/Signup/Signup"
 
-import Profile from "../pages/Profile/Profile"
+// import Progressbar from "@/Components/Progressbar"
+
+// import Profile from "@/pages/Profile/Profile"
+
 
 function Test() {
   return (
@@ -20,7 +23,8 @@ function Test() {
     {/* <Cta/> */}
     {/* <Signin/> */}
     {/* <Signup/> */}
-    <Profile/>
+    {/* <Profile/> */}
+    {/* <Progressbar progress={0}/> */}
     </>
   )
 }

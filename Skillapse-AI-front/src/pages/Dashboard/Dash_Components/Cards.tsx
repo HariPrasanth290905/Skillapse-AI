@@ -1,6 +1,6 @@
 import { useGSAP } from "@gsap/react";
-import { cardItems } from "./Dash";
 import gsap from "gsap";
+import { cardItems } from "./Dash";
 function Cards() {
   useGSAP(() => {
     const tl = gsap.timeline({
