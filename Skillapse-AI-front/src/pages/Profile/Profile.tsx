@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   User,
   Mail,
@@ -16,7 +16,9 @@ import {
   Book,
 } from "lucide-react";
 import Progressbar from "../../Components/Progressbar";
-import Analytics from "../Dashboard/Dash_Components/Analytics";
+import gsap from "gsap"; // GSAP Import
+import { useGSAP } from "@gsap/react";
+import ProgressBar from "../../Components/Progressbar";
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -41,6 +43,7 @@ export default function Profile() {
     { name: "PostgreSQL", level: 82 },
     { name: "AWS", level: 100 },
   ];
+
   const achievements = [
     { icon: Star, title: "Top Performer", description: "Ranked in top 5%" },
     { icon: Award, title: "Innovation Award", description: "Best solution 2024" },
@@ -63,11 +66,60 @@ export default function Profile() {
     setProfile((prev) => ({ ...prev, [field]: value }));
   };
 
+  // GSAP animation refs
+  const profileHeaderRef = useRef(null);
+  const contactRef = useRef(null);
+  const aboutRef = useRef(null);
+  const skillsRef = useRef(null);
+  const achievementsRef = useRef(null);
+  const projectsRef = useRef(null);
+
+  useGSAP(() => {
+    // GSAP Animations
+    gsap.from(profileHeaderRef.current, {
+      opacity: 0,
+      y: -50,
+      duration: 1,
+      ease: "power2.out",
+    });
+
+    gsap.from(contactRef.current, {
+      opacity: 0,
+      x: -100,
+      duration: 1,
+      delay: 0.5,
+      ease: "power2.out",
+    });
+    gsap.from(aboutRef.current, {
+      opacity: 0,
+      x: 100,
+      duration: 1,
+      delay: 0.5,
+      ease: "power2.out",
+    });
+
+    gsap.from(skillsRef.current, {
+      opacity: 0,
+      y: 100,
+      duration: 1,
+      delay: 0.5,
+      ease: "power2.out",
+    });
+
+    gsap.from([projectsRef.current, achievementsRef.current], {
+      opacity: 0,
+      y: 100,
+      duration: 1,
+      delay: 1.5,
+      ease: "power2.out",
+    });
+  }, []);
+
   return (
-    <div className="min-h-screen text-white font-sans bg-black p-6">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen p-6 ">
+      <div className="max-w-10/12 mx-auto space-y-8">
         {/* Header */}
-        <div className="prof-header trans">
+        <div className="prof-header trans" ref={profileHeaderRef}>
           <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
             {/* Avatar */}
             <div className="relative">
@@ -98,11 +150,12 @@ export default function Profile() {
                 </>
               ) : (
                 <>
-                  <h1 className="text-3xl font-bold gradient-text">{profile.name}</h1>
+                  <h1 className="text-3xl font-bold gradient-text">
+                    {profile.name}
+                  </h1>
                   <p className="text-xl text-gray-400">{profile.title}</p>
                 </>
               )}
-
               <div className="flex gap-3 mt-3">
                 <span className="experience prof-badge">
                   <Briefcase className="w-4 h-4" /> {profile.experience}
@@ -116,10 +169,7 @@ export default function Profile() {
             {/* Action Buttons */}
             <div className="lg:ml-auto flex gap-3">
               {isEditing ? (
-                <button
-                  onClick={handleSave}
-                  className="prof-button"
-                >
+                <button onClick={handleSave} className="prof-button">
                   <Save className="w-4 h-4" /> Save Details
                 </button>
               ) : (
@@ -137,9 +187,12 @@ export default function Profile() {
         {/* Contact + Bio */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Contact */}
-          <div className="p-6 rounded-lg border border-gray-700 trans">
+          <div
+            className="p-6 rounded-lg border border-gray-700 trans"
+            ref={contactRef}
+          >
             <h2 className="prof-head gradient-text">
-              <User className="w-5 h-5"  color="white" /> Contact
+              <User className="w-5 h-5" color="white" /> Contact
             </h2>
             {isEditing ? (
               <div className="space-y-3">
@@ -155,7 +208,9 @@ export default function Profile() {
                 />
                 <input
                   value={profile.location}
-                  onChange={(e) => handleInputChange("location", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("location", e.target.value)
+                  }
                   className="w-full p-2 bg-gray-800 border border-gray-600 rounded"
                 />
               </div>
@@ -179,7 +234,10 @@ export default function Profile() {
           </div>
 
           {/* Bio */}
-          <div className="lg:col-span-2 p-6 rounded-lg border trans border-gray-700">
+          <div
+            className="lg:col-span-2 p-6 rounded-lg border trans border-gray-700"
+            ref={aboutRef}
+          >
             <h2 className="prof-head gradient-text">About Me</h2>
             {isEditing ? (
               <textarea
@@ -194,9 +252,12 @@ export default function Profile() {
         </div>
 
         {/* Skills */}
-        <div className="p-6 rounded-lg border border-gray-700 trans">
+        <div
+          className="p-6 rounded-lg border border-gray-700 trans"
+          ref={skillsRef}
+        >
           <h2 className="prof-head gradient-text">
-            <TrendingUp className="w-5 h-5" color="white"/> Skills & Expertise
+            <TrendingUp className="w-5 h-5" color="white" /> Skills & Expertise
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
             {skills.map((skill) => (
@@ -210,12 +271,16 @@ export default function Profile() {
             ))}
           </div>
         </div>
+
         {/* Achievements & Projects */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 ">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Achievements */}
-          <div className="p-6 rounded-lg border border-gray-700 trans">
+          <div
+            className="p-6 rounded-lg border border-gray-700 trans"
+            ref={achievementsRef}
+          >
             <h2 className="prof-head gradient-text">
-              <Award className="w-5 h-5" color="white"/> Achievements
+              <Award className="w-5 h-5" color="white" /> Achievements
             </h2>
             <div className="space-y-3">
               {achievements.map((a) => {
@@ -239,9 +304,12 @@ export default function Profile() {
           </div>
 
           {/* Projects */}
-          <div className="p-6 rounded-lg border border-gray-700 trans">
+          <div
+            className="p-6 rounded-lg border border-gray-700 trans"
+            ref={projectsRef}
+          >
             <h2 className="prof-head gradient-text">
-              <Target className="w-5 h-5" color="white"/> Active Projects
+              <Target className="w-5 h-5" color="white" /> Active Projects
             </h2>
             <div className="space-y-4">
               {projects.map((p) => (
@@ -252,12 +320,7 @@ export default function Profile() {
                       {p.status}
                     </span>
                   </div>
-                  <div className="w-full h-2 bg-gray-700 mt-2 rounded">
-                    <div
-                      className="h-2 bg-blue-500 rounded"
-                      style={{ width: `${p.progress}%` }}
-                    ></div>
-                  </div>
+                  <ProgressBar progress={p.progress} />
                 </div>
               ))}
             </div>
