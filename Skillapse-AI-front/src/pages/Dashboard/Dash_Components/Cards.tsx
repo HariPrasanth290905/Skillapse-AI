@@ -12,7 +12,7 @@ function Cards() {
     });
 
     tl.from("#cards div", {
-      y: (i, target) => (window.innerWidth < 640 ? 20 : 40),
+      y: 100,
       opacity: 0,
       stagger: 0.2,
       duration: 1,

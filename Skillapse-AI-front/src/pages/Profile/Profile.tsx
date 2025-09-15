@@ -1,78 +1,247 @@
-import { useState, useRef } from "react";
-import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Briefcase,
-  Calendar,
-  Edit,
-  Save,
-  Camera,
-  Star,
-  TrendingUp,
-  Award,
-  Target,
-  Book,
-} from "lucide-react";
-import Progressbar from "../../Components/Progressbar";
-import gsap from "gsap"; // GSAP Import
+import { useState, useRef, useEffect } from "react";
+import axios from "axios";
+import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import ProgressBar from "../../Components/Progressbar";
+import Skills from "./Profile Components/Skills";
+import Achievements from "./Profile Components/Achievements";
+import ProfileHeader from "./Profile Components/ProfileHeader";
+import ProfileContact from "./Profile Components/ProfileContact";
+import ProfileAbout from "./Profile Components/ProfileAbout";
 
 export default function Profile() {
-  const [isEditing, setIsEditing] = useState(false);
+  const [originalProfile, setOriginalProfile] = useState({
+    username: "",
+    fullName: "",
+    position: "",
+    email: "",
+    phone: "",
+    address: "",
+    aboutMe: "",
+    company: "",
+    experience: "",
+    joinDate: "",
+  });
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  // Per-section edit and saving states
+  const [isEditingHeader, setIsEditingHeader] = useState<boolean>(false);
+  const [isEditingContact, setIsEditingContact] = useState<boolean>(false);
+  const [isEditingAbout, setIsEditingAbout] = useState<boolean>(false);
 
   const [profile, setProfile] = useState({
-    name: "Alex Thompson",
-    title: "Full Stack Developer",
-    email: "alex.thompson@skillmatch.ai",
-    phone: "+1 (555) 123-4567",
-    location: "San Francisco, CA",
-    bio: "Passionate full-stack developer with 5+ years of experience building scalable web applications. Expert in React, Node.js, and cloud technologies with a strong focus on user experience and performance optimization.",
-    company: "Tech Innovators Inc.",
-    experience: "5+ Years",
-    joinDate: "March 2023",
+    id: "",
+    username: "",
+    fullName: "",
+    position: "",
+    email: "",
+    phone: "",
+    address: "",
+    aboutMe: "",
+    // company: "",
+    experience: "",
+    joinDate: "",
   });
 
-  const skills = [
-    { name: "React", level: 95 },
-    { name: "TypeScript", level: 90 },
-    { name: "Node.js", level: 88 },
-    { name: "Python", level: 85 },
-    { name: "PostgreSQL", level: 82 },
-    { name: "AWS", level: 100 },
-  ];
+  useEffect(() => {
+    const token = sessionStorage.getItem("accessToken");
+    const fetchProfile = async () => {
+      try {
+        setError(null);
+        setLoading(true);
+        const res = await axios.get(`http://localhost:8080/user/getUser`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = res.data || {};
+        console.log(data)
+        // Map backend user data into our local profile shape safely
+        const mapped = {
+          id: data.id || data.userid || "",
+          username: data.username || data.username || "",
+          fullName: data.fullName || "",
+          position: data.position || data.position || "",
+          email: data.email || "",
+          phone: data.phone || "",
+          address: data.address || data.city || "",
+          aboutMe: data.bio || data.about || "",
+          experience: data.experience || data.yearsOfExperience || "",
+          joinDate: data.joinDate || data.createdAt || "",
+        };
+        setProfile(mapped);
+        setOriginalProfile({
+          username: mapped.username,
+          position: mapped.position,
+          fullName: mapped.fullName,
+          email: mapped.email,
+          phone: mapped.phone,
+          address: mapped.address,
+          aboutMe: mapped.aboutMe,
+          company: data.company || "",
+          experience: mapped.experience,
+          joinDate: mapped.joinDate,
+        });
+      } catch (err: unknown) {
+        console.error(err);
+        const msg = (err as { response?: { data?: { message?: string } } }).response?.data?.message;
+        setError(msg || "Failed to load profile information.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const achievements = [
-    { icon: Star, title: "Top Performer", description: "Ranked in top 5%" },
-    { icon: Award, title: "Innovation Award", description: "Best solution 2024" },
-    { icon: Target, title: "Goal Achiever", description: "100% completion" },
-    { icon: Book, title: "Mentor", description: "Guided 10+ juniors" },
-  ];
+    fetchProfile();
+  }, []);
 
-  const projects = [
-    { name: "E-commerce Platform", progress: 100, status: "Completed" },
-    { name: "AI Dashboard", progress: 75, status: "In Progress" },
-    { name: "Mobile App", progress: 30, status: "Planning" },
-  ];
+  const [savingHeader, setSavingHeader] = useState(false);
+  const [savingContact, setSavingContact] = useState(false);
+  const [savingAbout, setSavingAbout] = useState(false);
 
-  const handleSave = () => {
-    setIsEditing(false);
-    console.log("Profile saved:", profile);
+  const handleSaveHeader = async () => {
+    try {
+      setSavingHeader(true);
+      setError(null);
+      const token = sessionStorage.getItem("accessToken");
+      const payload = {
+        id: profile.id,
+        username: profile.username,
+        position: profile.position,
+        experience: profile.experience,
+      };
+      await axios.put(`http://localhost:8080/user/update`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      // sync originals for header fields after successful save
+      setOriginalProfile((prev) => ({
+        ...prev,
+        username: profile.username,
+        position: profile.position,
+        experience: profile.experience,
+      }));
+      setIsEditingHeader(false);
+    } catch (e) {
+      const err = e as { response?: { data?: { message?: string } } };
+      console.error(err);
+      setError(
+        err.response?.data?.message ||
+        "Failed to update header info. Please try again."
+      );
+    } finally {
+      setSavingHeader(false);
+    }
+  };
+
+  const handleSaveContact = async () => {
+    try {
+      setSavingContact(true);
+      setError(null);
+      const token = sessionStorage.getItem("accessToken");
+      const payload = {
+        id: profile.id,
+        email: profile.email,
+        phone: profile.phone,
+        address: profile.address,
+      };
+      await axios.put(`http://localhost:8080/user/update`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      // sync originals for contact fields after successful save
+      setOriginalProfile((prev) => ({
+        ...prev,
+        email: profile.email,
+        phone: profile.phone,
+        address: profile.address,
+      }));
+      setIsEditingContact(false);
+    } catch (e) {
+      const err = e as { response?: { data?: { message?: string } } };
+      console.error(err);
+      setError(
+        err.response?.data?.message ||
+        "Failed to update contact. Please try again."
+      );
+    } finally {
+      setSavingContact(false);
+    }
+  };
+
+  const handleSaveAbout = async () => {
+    try {
+      setSavingAbout(true);
+      setError(null);
+      const token = sessionStorage.getItem("accessToken");
+      const payload = {
+        id: profile.id,
+        bio: profile.aboutMe,
+      };
+      await axios.put(`http://localhost:8080/user/update`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      // sync originals for about field after successful save
+      setOriginalProfile((prev) => ({
+        ...prev,
+        aboutMe: profile.aboutMe,
+      }));
+      setIsEditingAbout(false);
+    } catch (e) {
+      const err = e as { response?: { data?: { message?: string } } };
+      console.error(err);
+      setError(
+        err.response?.data?.message ||
+        "Failed to update about section. Please try again."
+      );
+    } finally {
+      setSavingAbout(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
     setProfile((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Cancel handlers to revert draft edits
+  const handleCancelHeader = () => {
+    setProfile((prev) => ({
+      ...prev,
+      username: originalProfile.username,
+      position: originalProfile.position,
+      company: originalProfile.company,
+      experience: originalProfile.experience,
+    }));
+    setIsEditingHeader(false);
+  };
+
+  const handleCancelContact = () => {
+    setProfile((prev) => ({
+      ...prev,
+      email: originalProfile.email,
+      phone: originalProfile.phone,
+      address: originalProfile.address,
+    }));
+    setIsEditingContact(false);
+  };
+
+  const handleCancelAbout = () => {
+    setProfile((prev) => ({
+      ...prev,
+      aboutMe: originalProfile.aboutMe,
+    }));
+    setIsEditingAbout(false);
+  };
+
   // GSAP animation refs
-  const profileHeaderRef = useRef(null);
-  const contactRef = useRef(null);
-  const aboutRef = useRef(null);
-  const skillsRef = useRef(null);
-  const achievementsRef = useRef(null);
-  const projectsRef = useRef(null);
+  const profileHeaderRef = useRef<HTMLDivElement>(null!);
+  const contactRef = useRef<HTMLDivElement>(null!);
+  const aboutRef = useRef<HTMLDivElement>(null!);
 
   useGSAP(() => {
     // GSAP Animations
@@ -98,234 +267,68 @@ export default function Profile() {
       ease: "power2.out",
     });
 
-    gsap.from(skillsRef.current, {
-      opacity: 0,
-      y: 100,
-      duration: 1,
-      delay: 0.5,
-      ease: "power2.out",
-    });
 
-    gsap.from([projectsRef.current, achievementsRef.current], {
-      opacity: 0,
-      y: 100,
-      duration: 1,
-      delay: 1.5,
-      ease: "power2.out",
-    });
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen p-6 flex items-center justify-center">
+        <p className="text-gray-400">Loading profile...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen p-6 ">
-      <div className="max-w-10/12 mx-auto space-y-8">
-        {/* Header */}
-        <div className="prof-header trans" ref={profileHeaderRef}>
-          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
-            {/* Avatar */}
-            <div className="relative">
-              <img
-                src="/natori.jpg"
-                alt="Profile"
-                className="w-25 h-25 rounded-full"
-              />
-              <button className="prof-img">
-                <Camera className="w-5 h-5 text-white" />
-              </button>
-            </div>
-
-            {/* Info */}
-            <div className="space-y-2">
-              {isEditing ? (
-                <>
-                  <input
-                    value={profile.name}
-                    onChange={(e) => handleInputChange("name", e.target.value)}
-                    className="text-2xl font-bold bg-gray-800 border border-gray-600 p-2 rounded w-full"
-                  />
-                  <input
-                    value={profile.title}
-                    onChange={(e) => handleInputChange("title", e.target.value)}
-                    className="text-lg bg-gray-800 border border-gray-600 p-2 rounded w-full"
-                  />
-                </>
-              ) : (
-                <>
-                  <h1 className="text-3xl font-bold gradient-text">
-                    {profile.name}
-                  </h1>
-                  <p className="text-xl text-gray-400">{profile.title}</p>
-                </>
-              )}
-              <div className="flex gap-3 mt-3">
-                <span className="experience prof-badge">
-                  <Briefcase className="w-4 h-4" /> {profile.experience}
-                </span>
-                <span className="since prof-badge">
-                  <Calendar className="w-4 h-4" /> Since {profile.joinDate}
-                </span>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="lg:ml-auto flex gap-3">
-              {isEditing ? (
-                <button onClick={handleSave} className="prof-button">
-                  <Save className="w-4 h-4" /> Save Details
-                </button>
-              ) : (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="prof-button"
-                >
-                  <Edit className="w-4 h-4" /> Edit Profile
-                </button>
-              )}
-            </div>
+      <div className="w-10/12 mx-auto space-y-8">
+        {error && (
+          <div className="p-3 border border-red-500 rounded text-red-400 bg-red-900/20">
+            {error}
           </div>
-        </div>
+        )}
+        {/* Header */}
+        <ProfileHeader
+          profile={{ id: profile.id, username: profile.username, fullName: profile.fullName, position: profile.position, experience: profile.experience, joinDate: profile.joinDate }}
+          isEditing={isEditingHeader}
+          saving={savingHeader}
+          onChange={handleInputChange}
+          onEdit={() => setIsEditingHeader(true)}
+          onSave={handleSaveHeader}
+          onCancel={handleCancelHeader}
+          containerRef={profileHeaderRef}
+        />
 
         {/* Contact + Bio */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Contact */}
-          <div
-            className="p-6 rounded-lg border border-gray-700 trans"
-            ref={contactRef}
-          >
-            <h2 className="prof-head gradient-text">
-              <User className="w-5 h-5" color="white" /> Contact
-            </h2>
-            {isEditing ? (
-              <div className="space-y-3">
-                <input
-                  value={profile.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  className="w-full p-2 bg-gray-800 border border-gray-600 rounded"
-                />
-                <input
-                  value={profile.phone}
-                  onChange={(e) => handleInputChange("phone", e.target.value)}
-                  className="w-full p-2 bg-gray-800 border border-gray-600 rounded"
-                />
-                <input
-                  value={profile.location}
-                  onChange={(e) =>
-                    handleInputChange("location", e.target.value)
-                  }
-                  className="w-full p-2 bg-gray-800 border border-gray-600 rounded"
-                />
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <p className="flex gap-2 items-center">
-                  <Mail className="w-4 h-4 text-pink-400" /> {profile.email}
-                </p>
-                <p className="flex gap-2 items-center">
-                  <Phone className="w-4 h-4 text-blue-400" /> {profile.phone}
-                </p>
-                <p className="flex gap-2 items-center">
-                  <MapPin className="w-4 h-4 text-green-400" /> {profile.location}
-                </p>
-                <p className="flex gap-2 items-center">
-                  <Briefcase className="w-4 h-4 text-yellow-400" />{" "}
-                  {profile.company}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Bio */}
-          <div
-            className="lg:col-span-2 p-6 rounded-lg border trans border-gray-700"
-            ref={aboutRef}
-          >
-            <h2 className="prof-head gradient-text">About Me</h2>
-            {isEditing ? (
-              <textarea
-                value={profile.bio}
-                onChange={(e) => handleInputChange("bio", e.target.value)}
-                className="w-full min-h-32 p-2 bg-gray-800 border border-gray-600 rounded"
-              />
-            ) : (
-              <p className="text-gray-400">{profile.bio}</p>
-            )}
-          </div>
+          <ProfileContact
+            profile={{ id: profile.id, email: profile.email, phone: profile.phone, address: profile.address }}
+            isEditing={isEditingContact}
+            saving={savingContact}
+            onChange={handleInputChange}
+            onEdit={() => setIsEditingContact(true)}
+            onSave={handleSaveContact}
+            onCancel={handleCancelContact}
+            containerRef={contactRef}
+          />
+          <ProfileAbout
+            id={profile.id}
+            aboutMe={profile.aboutMe}
+            isEditing={isEditingAbout}
+            saving={savingAbout}
+            onChange={(v) => handleInputChange("aboutMe", v)}
+            onEdit={() => setIsEditingAbout(true)}
+            onSave={handleSaveAbout}
+            onCancel={handleCancelAbout}
+            containerRef={aboutRef}
+          />
         </div>
 
         {/* Skills */}
-        <div
-          className="p-6 rounded-lg border border-gray-700 trans"
-          ref={skillsRef}
-        >
-          <h2 className="prof-head gradient-text">
-            <TrendingUp className="w-5 h-5" color="white" /> Skills & Expertise
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {skills.map((skill) => (
-              <div key={skill.name} className="flex flex-col gap-5">
-                <div className="flex justify-between">
-                  <span>{skill.name}</span>
-                  <span>{skill.level}%</span>
-                </div>
-                <Progressbar progress={skill.level} />
-              </div>
-            ))}
-          </div>
-        </div>
+
+        <Skills />
 
         {/* Achievements & Projects */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Achievements */}
-          <div
-            className="p-6 rounded-lg border border-gray-700 trans"
-            ref={achievementsRef}
-          >
-            <h2 className="prof-head gradient-text">
-              <Award className="w-5 h-5" color="white" /> Achievements
-            </h2>
-            <div className="space-y-3">
-              {achievements.map((a) => {
-                const Icon = a.icon;
-                return (
-                  <div
-                    key={a.title}
-                    className="flex items-start gap-3 bg-gray-800 p-3 rounded"
-                  >
-                    <div className="w-10 h-10 bg-pink-600 flex items-center justify-center rounded">
-                      <Icon className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold">{a.title}</h4>
-                      <p className="text-gray-400 text-sm">{a.description}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Projects */}
-          <div
-            className="p-6 rounded-lg border border-gray-700 trans"
-            ref={projectsRef}
-          >
-            <h2 className="prof-head gradient-text">
-              <Target className="w-5 h-5" color="white" /> Active Projects
-            </h2>
-            <div className="space-y-4">
-              {projects.map((p) => (
-                <div key={p.name} className="bg-gray-800 p-3 rounded">
-                  <div className="flex justify-between">
-                    <span>{p.name}</span>
-                    <span className="px-2 py-1 text-xs bg-gray-700 rounded">
-                      {p.status}
-                    </span>
-                  </div>
-                  <ProgressBar progress={p.progress} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <Achievements />
       </div>
     </div>
   );

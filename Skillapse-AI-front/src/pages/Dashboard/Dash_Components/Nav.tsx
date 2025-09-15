@@ -5,7 +5,7 @@ import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 function Nav() {
-  const [username, setUserName] = useState("");
+  const [fullName, setFullName] = useState("");
   const [position, setPosition] = useState("");
   const [profile, setProfile] = useState(null);
 
@@ -23,7 +23,7 @@ function Nav() {
         })
         .then((res) => {
           console.log(res);
-          setUserName(res.data.username);
+          setFullName(res.data.fullName);
           setPosition(res.data.position);
           setProfile(res.data.profile);
         })
@@ -46,15 +46,16 @@ function Nav() {
       <h1 className="head">Dashboard</h1>
       <div>
         <Bell />
-        {username ? (
+        {fullName ? (
           <>
             <div>
-              <p>{username}</p>
+              <p>{fullName}</p>
               <i>
                 <span className="text-gray-400">{position}</span>
               </i>
             </div>
-            <img src={profile || "blank.png"} alt="Profile" />
+            <img src={profile || "blank.png"} alt="Profile" 
+            onClick={() => navigate('/profile')}/>
           </>
         ) : (
           <button

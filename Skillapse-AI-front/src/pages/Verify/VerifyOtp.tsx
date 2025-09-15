@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 function VerifyOtp() {
-  const location = useLocation();
+  const location = useLocation() as { state?: { email?: string; username?: string; from?: { pathname?: string; search?: string } } };
   const inputs = useRef<Array<HTMLInputElement | null>>([]);
   const navigate = useNavigate();
   const { email, username } = location.state || {};
@@ -71,7 +71,10 @@ function VerifyOtp() {
       )
       .then((res) => {
         sessionStorage.setItem("accessToken", res.data);
-        navigate("/", { replace: true });
+        const to = location.state?.from?.pathname
+          ? `${location.state.from.pathname}${location.state.from.search || ""}`
+          : "/";
+        navigate(to, { replace: true });
       })
       .catch((err) => {
         console.log(err);

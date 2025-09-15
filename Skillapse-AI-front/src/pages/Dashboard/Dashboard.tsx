@@ -22,7 +22,7 @@ function Dashboard() {
       stagger: 0.2,
       opacity: 0,
       duration: 1,
-      delay:0.2,
+      delay: 0.2,
       ease: "power3.inOut",
     });
   }, []);
@@ -36,10 +36,9 @@ function Dashboard() {
       <Cards />
       <section className="dash-analytics">
         <Core />
-        <Analytics />
+        <Analytics/>
       </section>
-      <Cta />
-    </>
+      <Cta /></>
   );
 }
 

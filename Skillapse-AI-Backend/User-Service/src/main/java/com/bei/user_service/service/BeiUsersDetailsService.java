@@ -21,9 +21,7 @@ public class BeiUsersDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        BeiUsers user = userRepo.findByUsername(username);
-        if (user==null)
-            throw new UsernameNotFoundException("User not found with username: " + username);
+        BeiUsers user = userRepo.findByUsernameCaseSensitive(username).get();
         System.out.println("User " + user);
         return new User(
                 user.getUsername(),

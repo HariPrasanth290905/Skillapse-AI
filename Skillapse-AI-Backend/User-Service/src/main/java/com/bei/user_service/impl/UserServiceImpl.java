@@ -4,8 +4,6 @@ import com.bei.user_service.dto.UserDto;
 import com.bei.user_service.model.BeiUsers;
 import com.bei.user_service.dto.LoginRequest;
 import com.bei.user_service.repo.UserRepo;
-import com.bei.user_service.service.BeiUsersDetailsService;
-import com.bei.user_service.service.JwtService;
 import com.bei.user_service.service.RedisService;
 import com.bei.user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +11,12 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,16 +26,11 @@ public class UserServiceImpl implements UserService {
     private UserRepo userRepo;
 
     @Autowired
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     private JavaMailSender mailSender;
 
     @Autowired
     AuthenticationManager authManager;
-
-    @Autowired
-    private JwtService jwtService;
-
-    @Autowired
-    BeiUsersDetailsService userDS;
 
     @Autowired
     RedisService redisService;
@@ -45,35 +39,68 @@ public class UserServiceImpl implements UserService {
         if (beiUsers == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
+        if (beiUsers.getUsername() == null || beiUsers.getUsername().isBlank()) {
+            throw new IllegalArgumentException("Username is required");
+        }
+        if (beiUsers.getEmail() == null || beiUsers.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        if (beiUsers.getPassword() == null || beiUsers.getPassword().isBlank()) {
+            throw new IllegalArgumentException("Password is required");
+        }
         beiUsers.setPassword(new BCryptPasswordEncoder(12).encode(beiUsers.getPassword()));
-        beiUsers.setRole("ROLE_USER");
+        if (beiUsers.getRole() == null || beiUsers.getRole().isBlank()) {
+            beiUsers.setRole("ROLE_USER");
+        }
         return userRepo.save(beiUsers);
     }
 
     @Override
-    public BeiUsers updateUser(UUID id, BeiUsers updatedUser) {
-        return userRepo.findById(id)
-                .map(existingUser -> {
-                    existingUser.setUsername(updatedUser.getUsername());
-                    existingUser.setFullName(updatedUser.getFullName());
-                    existingUser.setEmail(updatedUser.getEmail());
-                    existingUser.setBio(updatedUser.getBio());
-                    existingUser.setProfilePicUrl(updatedUser.getProfilePicUrl());
-                    existingUser.setPassword(new BCryptPasswordEncoder(12).encode(updatedUser.getPassword()));
-                    existingUser.setActive(updatedUser.isActive());
-                    return userRepo.save(existingUser);
-                })
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+    @Transactional
+    public BeiUsers updateUser(UserDto updatedUser) {
+        if (updatedUser == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+        if(updatedUser.getId() == null){
+            throw new IllegalArgumentException("User id cannot be null");
+        }
+        BeiUsers user = userRepo.findById(updatedUser.getId()).orElseThrow(() -> new RuntimeException("User not found with id: " + updatedUser.getId()));
+        if (updatedUser.getFullName() != null && !updatedUser.getFullName().isBlank()) {
+            user.setFullName(updatedUser.getFullName());
+        }
+        if (updatedUser.getPosition() != null && !updatedUser.getPosition().isBlank()) {
+            user.setPosition(updatedUser.getPosition());
+        }
+        if(updatedUser.getContact()!=null){
+            user.setContact(updatedUser.getContact());
+        }
+        if(updatedUser.getExperience()!=null){
+            user.setExperience(updatedUser.getExperience());
+        }
+        if(updatedUser.getAboutMe()!=null && !updatedUser.getAboutMe().isBlank()){
+            user.setAboutMe(updatedUser.getAboutMe());
+        }
+        return userRepo.save(user);
     }
 
     @Override
     public UserDto getUser(String username) {
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("Username is required");
+        }
+        BeiUsers user = userRepo.findByUsernameCaseSensitive(username).get();
 
-        BeiUsers user = userRepo.findByUsername(username);
+
         return UserDto.builder()
-                .username(user.getUsername())
+                .id(user.getId())
+                .aboutMe(user.getAboutMe())
+                .contact(user.getContact())
+                .fullName(user.getFullName())
                 .position(user.getPosition())
-                .profile(user.getProfilePicUrl())
+                .experience(user.getExperience())
+                .createdAt(user.getCreatedAt()
+                        .format(DateTimeFormatter.ofPattern("MMMM yyyy")))
+//                .profilePicUrl(user.getProfilePicUrl())
                 .build();
     }
 
@@ -87,17 +114,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String login(LoginRequest loginRequest) {
+        if (loginRequest == null || loginRequest.getUsername() == null || loginRequest.getPassword() == null) {
+            throw new IllegalArgumentException("Username and password are required");
+        }
         try {
             authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-            BeiUsers user = userRepo.findByUsername(loginRequest.getUsername());
-            System.out.println("User " + user);
-
+            BeiUsers user = userRepo.findByUsernameCaseSensitive(loginRequest.getUsername()).get();
             return verifyEmail(user.getEmail());
 
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException(ex.getMessage());
         }
     }
 
@@ -110,9 +138,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String verifyEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Email is required");
+        }
         // Generate 6-digit OTP
         String otp = String.valueOf((int) (Math.random() * 900000) + 100000);
-
 
         redisService.saveOtp(email, otp);
         // Create mail message
@@ -120,9 +150,7 @@ public class UserServiceImpl implements UserService {
         mailMessage.setTo(email);
         mailMessage.setSubject("Verify your email");
         mailMessage.setFrom("beiverify@gmail.com");
-        mailMessage.setText("Enter this OTP to verify your email: " +otp);
-
-
+        mailMessage.setText("Enter this OTP to verify your email: " + otp);
 
         // Send mail
         mailSender.send(mailMessage);
@@ -133,9 +161,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean verifyOTP(String OTP, String email) {
+        if (email == null || email.isBlank() || OTP == null || OTP.isBlank()) {
+            return false;
+        }
         boolean isValid = redisService.validateOtp(email, OTP);
         if (isValid) {
             redisService.deleteOtp(email);
+            // Mark email as verified for the user with this email
+            BeiUsers user = userRepo.findByEmail(email);
+            if (user != null) {
+                user.setEmailVerified(true);
+                user.setFailedLoginAttempts(0);
+                user.setAccountLocked(false);
+                user.setLastLoginAt(java.time.LocalDateTime.now());
+                userRepo.save(user);
+            }
         }
         return isValid;
     }

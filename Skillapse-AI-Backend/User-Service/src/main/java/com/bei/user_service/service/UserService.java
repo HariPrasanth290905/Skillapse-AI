@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface UserService {
     BeiUsers addUser(BeiUsers beiUsers);
-    BeiUsers updateUser(UUID id, BeiUsers updatedUser);
+    BeiUsers updateUser(UserDto payload);
     UserDto getUser(String username);
     void deleteUser(UUID id);
     String login(LoginRequest loginRequest);

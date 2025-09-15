@@ -27,10 +27,10 @@ public class UserController {
         return "Successful";
     }
 
-    @PostMapping("/update")
-    ResponseEntity<?> updateUser(@RequestBody BeiUsers beiUsers){
+    @PutMapping("/update")
+    ResponseEntity<?> updateUser(@RequestBody UserDto users){
         try {
-            return new ResponseEntity<>(userService.updateUser(beiUsers.getId(), beiUsers), HttpStatus.OK);
+            return new ResponseEntity<>(userService.updateUser(users), HttpStatus.OK);
         }
         catch (Exception ex){
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);

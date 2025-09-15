@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Signin() {
+  const location = useLocation() as { state?: { from?: { pathname?: string; search?: string } } };
   const [user, setUser] = useState({
     username: "",
     password: "",
@@ -19,7 +20,7 @@ function Signin() {
         console.log(res.data);
         navigate("/verifyOtp", {
           replace: true,
-          state: { email: res.data, username: user.username },
+          state: { email: res.data, username: user.username, from: location.state?.from },
         });
       })
       .catch((err) => {

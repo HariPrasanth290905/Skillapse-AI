@@ -7,7 +7,10 @@ import Test from "./Test/Test";
 import Notfound from "./Notfound";
 import Signup from "./pages/Signup/Signup";
 import Profile from "./pages/Profile/Profile";
-
+import ProtectedRoute from "./routes/ProtectedRoute";
+import gsap from "gsap";
+import { ScrollTrigger, SplitText } from "gsap/all";
+gsap.registerPlugin(ScrollTrigger,SplitText);
 function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -16,9 +19,11 @@ function App() {
         <Route path="signup" element={<Signup />} />
         <Route path="signin" element={<Signin />} />
         <Route path="verifyOtp" element={<VerifyOtp />} />
-        <Route path="profile" element={<Profile />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="profile" element={<Profile />} />
+        </Route>
         <Route path="test" element={<Test />} />
-        
+
         <Route path="*" element={<Notfound />} />
       </Route>
     )
