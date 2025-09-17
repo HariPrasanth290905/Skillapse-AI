@@ -34,7 +34,8 @@ function Welcome() {
       for (let i = 0; i < steps; i++) {
         const x = Math.random() * (vw - size);
         const y = Math.random() * (vh - size);
-        const duration = 0.5 + Math.random() * 2;
+        const duration = 0.5 + Math.random() * 1;
+        // const duration = 0.1;
         tl.to(botContainer, { x, y, duration, ease: "power1.inOut" });
       }
       tl.pause();

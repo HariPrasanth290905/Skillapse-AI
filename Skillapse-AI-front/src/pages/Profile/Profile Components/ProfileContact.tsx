@@ -1,11 +1,13 @@
-import { Briefcase, Edit, Mail, MapPin, Phone, Save, User } from "lucide-react";
+import { Edit, Mail, MapPin, Phone, Save, User } from "lucide-react";
 
 export type ProfileContactProps = {
   profile: {
-    id:string;
-    email: string;
-    phone: string;
-    address: string;
+    id: string;
+    contact: {
+      email: string;
+      phone: string;
+      address: string;
+    };
     company?: string;
   };
   isEditing: boolean;
@@ -27,6 +29,7 @@ export default function ProfileContact({
   onCancel,
   containerRef,
 }: ProfileContactProps) {
+  // console.log('Contact recieved -> ',profile)
   return (
     <div className="p-6 rounded-lg border border-gray-700 trans" ref={containerRef}>
       <h2 className="prof-head gradient-text">
@@ -36,19 +39,19 @@ export default function ProfileContact({
         <div className="space-y-3">
           <input
             placeholder="Email"
-            value={profile.email}
+            value={profile.contact.email}
             onChange={(e) => onChange("email", e.target.value)}
             className="w-full p-2 bg-gray-800 border border-gray-600 rounded"
           />
           <input
             placeholder="Phone"
-            value={profile.phone}
+            value={profile.contact.phone}
             onChange={(e) => onChange("phone", e.target.value)}
             className="w-full p-2 bg-gray-800 border border-gray-600 rounded"
           />
           <input
             placeholder="Location"
-            value={profile.address}
+            value={profile.contact.address}
             onChange={(e) => onChange("address", e.target.value)}
             className="w-full p-2 bg-gray-800 border border-gray-600 rounded"
           />
@@ -63,7 +66,8 @@ export default function ProfileContact({
         </div>
       ) : (
         (() => {
-          const hasContact = Boolean((profile.email || "").trim() || (profile.phone || "").trim() || (profile.address || "").trim());
+          console.log('from return',profile.contact)
+          const hasContact = Boolean((profile.contact.email || "").trim() || (profile.contact.phone || "").trim() || (profile.contact.address || "").trim());
           if (!hasContact) {
             return (
               <div className="space-y-3">
@@ -77,16 +81,13 @@ export default function ProfileContact({
           return (
             <div className="space-y-3">
               <p className="flex gap-2 items-center">
-                <Mail className="w-4 h-4 text-pink-400" /> {profile.email}
+                <Mail className="w-4 h-4 text-pink-400" /> {profile.contact.email}
               </p>
               <p className="flex gap-2 items-center">
-                <Phone className="w-4 h-4 text-blue-400" /> {profile.phone}
+                <Phone className="w-4 h-4 text-blue-400" /> {profile.contact.phone}
               </p>
               <p className="flex gap-2 items-center">
-                <MapPin className="w-4 h-4 text-green-400" /> {profile.address}
-              </p>
-              <p className="flex gap-2 items-center">
-                <Briefcase className="w-4 h-4 text-yellow-400" /> {profile.company}
+                <MapPin className="w-4 h-4 text-green-400" /> {profile.contact.address}
               </p>
               <div className="flex justify-end pt-2">
                 <button type="button" className="prof-button" onClick={onEdit}>

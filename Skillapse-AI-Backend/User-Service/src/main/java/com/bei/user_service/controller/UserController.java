@@ -29,6 +29,7 @@ public class UserController {
 
     @PutMapping("/update")
     ResponseEntity<?> updateUser(@RequestBody UserDto users){
+        System.out.println("users: " + users);
         try {
             return new ResponseEntity<>(userService.updateUser(users), HttpStatus.OK);
         }

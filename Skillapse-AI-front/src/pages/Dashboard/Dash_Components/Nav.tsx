@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 function Nav() {
   const [fullName, setFullName] = useState("");
   const [position, setPosition] = useState("");
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState("");
 
   const navigate = useNavigate();
 
@@ -25,7 +25,7 @@ function Nav() {
           console.log(res);
           setFullName(res.data.fullName);
           setPosition(res.data.position);
-          setProfile(res.data.profile);
+          setProfile('/natori.jpg');
         })
         .catch((err) => {
           console.log(err);

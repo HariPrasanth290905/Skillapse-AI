@@ -61,8 +61,11 @@ public class BeiUsers implements Serializable {
     private String aboutMe;
 
     //Contact Details
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "contact_id" , referencedColumnName = "id")
+    @ToString.Exclude
+    @OneToOne(fetch = FetchType.LAZY
+            , cascade = CascadeType.ALL)
+    @JoinColumn(name = "contact_id" ,
+            referencedColumnName = "id")
     private Contact contact;
 
     @Column

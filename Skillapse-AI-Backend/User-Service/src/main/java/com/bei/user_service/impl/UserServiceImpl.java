@@ -1,8 +1,10 @@
 package com.bei.user_service.impl;
 
+import com.bei.user_service.dto.ContactDTO;
 import com.bei.user_service.dto.UserDto;
 import com.bei.user_service.model.BeiUsers;
 import com.bei.user_service.dto.LoginRequest;
+import com.bei.user_service.model.Contact;
 import com.bei.user_service.repo.UserRepo;
 import com.bei.user_service.service.RedisService;
 import com.bei.user_service.service.UserService;
@@ -16,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -57,44 +58,85 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public BeiUsers updateUser(UserDto updatedUser) {
-        if (updatedUser == null) {
-            throw new IllegalArgumentException("User cannot be null");
-        }
-        if(updatedUser.getId() == null){
+    public UserDto updateUser(UserDto updatedUser) {
+        if (updatedUser == null || updatedUser.getId() == null) {
             throw new IllegalArgumentException("User id cannot be null");
         }
-        BeiUsers user = userRepo.findById(updatedUser.getId()).orElseThrow(() -> new RuntimeException("User not found with id: " + updatedUser.getId()));
+
+        BeiUsers user = userRepo.findById(updatedUser.getId())
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + updatedUser.getId()));
+
         if (updatedUser.getFullName() != null && !updatedUser.getFullName().isBlank()) {
             user.setFullName(updatedUser.getFullName());
         }
         if (updatedUser.getPosition() != null && !updatedUser.getPosition().isBlank()) {
             user.setPosition(updatedUser.getPosition());
         }
-        if(updatedUser.getContact()!=null){
-            user.setContact(updatedUser.getContact());
+        if (updatedUser.getContact() != null) {
+            Contact contact = user.getContact();
+            if (contact == null) {
+                contact = new Contact();
+            }
+            // Do not overwrite contact ID from DTO to avoid accidental ID tampering
+            if (updatedUser.getContact().getPhone() != null && !updatedUser.getContact().getPhone().isBlank()) {
+                contact.setPhone(updatedUser.getContact().getPhone());
+            }
+            if (updatedUser.getContact().getAddress() != null && !updatedUser.getContact().getAddress().isBlank()) {
+                contact.setAddress(updatedUser.getContact().getAddress());
+            }
+            if (updatedUser.getContact().getEmail() != null && !updatedUser.getContact().getEmail().isBlank()) {
+                contact.setEmail(updatedUser.getContact().getEmail());
+                // Keep user email in sync when provided
+                user.setEmail(updatedUser.getContact().getEmail());
+            }
+            user.setContact(contact);
         }
-        if(updatedUser.getExperience()!=null){
+        if (updatedUser.getExperience() != null) {
             user.setExperience(updatedUser.getExperience());
         }
-        if(updatedUser.getAboutMe()!=null && !updatedUser.getAboutMe().isBlank()){
+        if (updatedUser.getAboutMe() != null && !updatedUser.getAboutMe().isBlank()) {
             user.setAboutMe(updatedUser.getAboutMe());
         }
-        return userRepo.save(user);
+        BeiUsers saved = userRepo.save(user);
+
+        return mapToDto(saved);
     }
+
+
+    private UserDto mapToDto(BeiUsers user) {
+        return UserDto.builder()
+                .id(user.getId())
+                .createdAt(user.getCreatedAt() != null ? user.getCreatedAt().toString() : null)
+                .fullName(user.getFullName())
+                .position(user.getPosition())
+                .experience(user.getExperience())
+                .aboutMe(user.getAboutMe())
+                .contact(user.getContact() != null ? mapToContactDto(user.getContact()) : null)
+                .build();
+    }
+
+    private ContactDTO mapToContactDto(Contact contact) {
+        return ContactDTO.builder()
+                .id(contact.getId())
+                .phone(contact.getPhone())
+                .email(contact.getEmail())
+                .address(contact.getAddress())
+                .build();
+    }
+
 
     @Override
     public UserDto getUser(String username) {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("Username is required");
         }
-        BeiUsers user = userRepo.findByUsernameCaseSensitive(username).get();
-
+        BeiUsers user = userRepo.findByUsernameCaseSensitive(username)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 
         return UserDto.builder()
                 .id(user.getId())
                 .aboutMe(user.getAboutMe())
-                .contact(user.getContact())
+                .contact(mapToContactDto(user.getContact()))
                 .fullName(user.getFullName())
                 .position(user.getPosition())
                 .experience(user.getExperience())
@@ -121,7 +163,8 @@ public class UserServiceImpl implements UserService {
             authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-            BeiUsers user = userRepo.findByUsernameCaseSensitive(loginRequest.getUsername()).get();
+            BeiUsers user = userRepo.findByUsernameCaseSensitive(loginRequest.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found with username: " + loginRequest.getUsername()));
             return verifyEmail(user.getEmail());
 
         } catch (Exception ex) {

@@ -13,9 +13,11 @@ export default function Profile() {
     username: "",
     fullName: "",
     position: "",
-    email: "",
-    phone: "",
-    address: "",
+    contact: {
+      email: "",
+      phone: "",
+      address: "",
+    },
     aboutMe: "",
     company: "",
     experience: "",
@@ -33,9 +35,11 @@ export default function Profile() {
     username: "",
     fullName: "",
     position: "",
-    email: "",
-    phone: "",
-    address: "",
+    contact: {
+      email: "",
+      phone: "",
+      address: "",
+    },
     aboutMe: "",
     // company: "",
     experience: "",
@@ -58,24 +62,29 @@ export default function Profile() {
         // Map backend user data into our local profile shape safely
         const mapped = {
           id: data.id || data.userid || "",
-          username: data.username || data.username || "",
+          username: data.username || "",
           fullName: data.fullName || "",
-          position: data.position || data.position || "",
-          email: data.email || "",
-          phone: data.phone || "",
-          address: data.address || data.city || "",
-          aboutMe: data.bio || data.about || "",
+          position: data.position || "",
+          contact: {
+            email: (data.contact && data.contact.email) || data.email || "",
+            phone: (data.contact && data.contact.phone) || data.phone || "",
+            address: (data.contact && data.contact.address) || data.address || data.city || "",
+          },
+          aboutMe: data.aboutMe || data.bio || "",
           experience: data.experience || data.yearsOfExperience || "",
           joinDate: data.joinDate || data.createdAt || "",
         };
         setProfile(mapped);
+        console.log('After set', profile)
         setOriginalProfile({
           username: mapped.username,
           position: mapped.position,
           fullName: mapped.fullName,
-          email: mapped.email,
-          phone: mapped.phone,
-          address: mapped.address,
+          contact: {
+            email: mapped.contact.email,
+            phone: mapped.contact.phone,
+            address: mapped.contact.address,
+          },
           aboutMe: mapped.aboutMe,
           company: data.company || "",
           experience: mapped.experience,
@@ -104,9 +113,8 @@ export default function Profile() {
       const token = sessionStorage.getItem("accessToken");
       const payload = {
         id: profile.id,
-        username: profile.username,
+        fullName: profile.fullName,
         position: profile.position,
-        experience: profile.experience,
       };
       await axios.put(`http://localhost:8080/user/update`, payload, {
         headers: {
@@ -135,16 +143,31 @@ export default function Profile() {
   };
 
   const handleSaveContact = async () => {
+    // Email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Phone validation: at least 7 digits, only numbers, spaces, dashes, plus
+    const phoneRegex = /^[+\d][\d\s-]{9}$/;
+    if (!emailRegex.test(profile.contact.email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (!phoneRegex.test(profile.contact.phone)) {
+      setError("Please enter a valid phone number.");
+      return;
+    }
     try {
       setSavingContact(true);
       setError(null);
       const token = sessionStorage.getItem("accessToken");
       const payload = {
         id: profile.id,
-        email: profile.email,
-        phone: profile.phone,
-        address: profile.address,
+        contact: {
+          email: profile.contact.email,
+          phone: profile.contact.phone,
+          address: profile.contact.address,
+        },
       };
+      console.log('paylaod->', payload)
       await axios.put(`http://localhost:8080/user/update`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -154,9 +177,12 @@ export default function Profile() {
       // sync originals for contact fields after successful save
       setOriginalProfile((prev) => ({
         ...prev,
-        email: profile.email,
-        phone: profile.phone,
-        address: profile.address,
+        contact: {
+          ...prev.contact,
+          email: profile.contact.email,
+          phone: profile.contact.phone,
+          address: profile.contact.address,
+        },
       }));
       setIsEditingContact(false);
     } catch (e) {
@@ -178,7 +204,7 @@ export default function Profile() {
       const token = sessionStorage.getItem("accessToken");
       const payload = {
         id: profile.id,
-        bio: profile.aboutMe,
+        aboutMe: profile.aboutMe,
       };
       await axios.put(`http://localhost:8080/user/update`, payload, {
         headers: {
@@ -205,10 +231,20 @@ export default function Profile() {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setProfile((prev) => ({ ...prev, [field]: value }));
+    if (["email", "phone", "address"].includes(field)) {
+      setProfile((prev) => ({
+        ...prev,
+        contact: {
+          ...prev.contact,
+          [field]: value,
+        },
+      }));
+    } else {
+      setProfile((prev) => ({ ...prev, [field]: value }));
+    }
   };
 
-  // Cancel handlers to revert draft edits
+  // Cancel handlers to revert edits
   const handleCancelHeader = () => {
     setProfile((prev) => ({
       ...prev,
@@ -223,12 +259,15 @@ export default function Profile() {
   const handleCancelContact = () => {
     setProfile((prev) => ({
       ...prev,
-      email: originalProfile.email,
-      phone: originalProfile.phone,
-      address: originalProfile.address,
+      contact: {
+        email: originalProfile.contact.email,
+        phone: originalProfile.contact.phone,
+        address: originalProfile.contact.address,
+      },
     }));
     setIsEditingContact(false);
   };
+
 
   const handleCancelAbout = () => {
     setProfile((prev) => ({
@@ -244,31 +283,35 @@ export default function Profile() {
   const aboutRef = useRef<HTMLDivElement>(null!);
 
   useGSAP(() => {
-    // GSAP Animations
-    gsap.from(profileHeaderRef.current, {
-      opacity: 0,
-      y: -50,
-      duration: 1,
-      ease: "power2.out",
-    });
-
-    gsap.from(contactRef.current, {
-      opacity: 0,
-      x: -100,
-      duration: 1,
-      delay: 0.5,
-      ease: "power2.out",
-    });
-    gsap.from(aboutRef.current, {
-      opacity: 0,
-      x: 100,
-      duration: 1,
-      delay: 0.5,
-      ease: "power2.out",
-    });
-
-
-  }, []);
+    if (!loading) {
+      if (profileHeaderRef.current) {
+        gsap.from(profileHeaderRef.current, {
+          opacity: 0,
+          y: -50,
+          duration: 1,
+          ease: "power2.out",
+        });
+      }
+      if (contactRef.current) {
+        gsap.from(contactRef.current, {
+          opacity: 0,
+          x: -100,
+          duration: 1,
+          delay: 0.5,
+          ease: "power2.out",
+        });
+      }
+      if (aboutRef.current) {
+        gsap.from(aboutRef.current, {
+          opacity: 0,
+          x: 100,
+          duration: 1,
+          delay: 0.5,
+          ease: "power2.out",
+        });
+      }
+    }
+  }, [loading]);
 
   if (loading) {
     return (
@@ -300,8 +343,16 @@ export default function Profile() {
 
         {/* Contact + Bio */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
           <ProfileContact
-            profile={{ id: profile.id, email: profile.email, phone: profile.phone, address: profile.address }}
+            profile={{
+              id: profile.id,
+              contact: {
+                email: profile.contact.email,
+                phone: profile.contact.phone,
+                address: profile.contact.address
+              }
+            }}
             isEditing={isEditingContact}
             saving={savingContact}
             onChange={handleInputChange}
