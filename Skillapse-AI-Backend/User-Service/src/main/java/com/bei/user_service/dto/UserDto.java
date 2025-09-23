@@ -1,6 +1,5 @@
 package com.bei.user_service.dto;
 
-import com.bei.user_service.model.Contact;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +21,7 @@ public class UserDto {
     private Integer experience;
 
     // Contact fields
-    private Contact contact;
+    private ContactDTO contact;
 
     // About section
     private String aboutMe;

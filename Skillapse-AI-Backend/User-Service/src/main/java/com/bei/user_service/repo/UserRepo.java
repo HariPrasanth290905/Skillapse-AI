@@ -13,8 +13,8 @@ import java.util.UUID;
 public interface UserRepo extends JpaRepository<BeiUsers, UUID> {
 
 
-    @Query(value = "SELECT * FROM bei_users WHERE username = :username", nativeQuery = true)
-    Optional<BeiUsers> findByUsernameCaseSensitive(String username);
+    @Query(value = "SELECT * FROM bei_users WHERE BINARY username = :username", nativeQuery = true)
+    Optional<BeiUsers> findByUsernameCaseSensitive(@Param("username") String username);
 
 
     BeiUsers findByEmail(String contactEmail);
