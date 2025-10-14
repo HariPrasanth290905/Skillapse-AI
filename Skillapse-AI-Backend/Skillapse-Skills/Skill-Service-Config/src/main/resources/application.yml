@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: Skill-Service
+
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/HariPrasanth290905/ConfigServer.git
+          username: HariPrasanth290905
+          password: ${GIT_TOKEN}
+
+#API endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+# Server port number
+server:
+  port: 8070
