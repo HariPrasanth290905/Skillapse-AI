@@ -4,7 +4,6 @@ package com.bei.user_service.model;
 import java.util.UUID;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -51,21 +50,17 @@ public class BeiUsers implements Serializable {
     @Column
     private String role;
 
-    @Column(nullable = false)
+    @Column(length = 100,nullable = false)
     private String position;
 
-    @Column(nullable = false, length = 100)
+    @Column(length = 100,nullable = false)
     private String fullName;
 
     @Column(length = 500)
     private String aboutMe;
 
     //Contact Details
-    @ToString.Exclude
-    @OneToOne(fetch = FetchType.LAZY
-            , cascade = CascadeType.ALL)
-    @JoinColumn(name = "contact_id" ,
-            referencedColumnName = "id")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Contact contact;
 
     @Column

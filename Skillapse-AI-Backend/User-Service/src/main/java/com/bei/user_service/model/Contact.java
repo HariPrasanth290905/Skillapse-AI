@@ -8,6 +8,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+/*
+A Contact entity that holds the contact information for
+each user with a one-to-one relationship
+*/
 
 @Data
 @Entity
@@ -16,10 +20,17 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Contact {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+    @Column(nullable = false, unique = true, length = 15)
     private String phone;
-    private String email;
+
+    @Column(nullable = false, length = 100)
     private String address;
+
+    //To make contact id same as user id
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    private BeiUsers user;
 
 }

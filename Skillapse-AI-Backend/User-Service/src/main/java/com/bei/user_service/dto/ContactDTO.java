@@ -1,5 +1,6 @@
 package com.bei.user_service.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,8 +13,8 @@ import java.util.UUID;
 @ToString
 @Builder
 public class ContactDTO {
-    private UUID id;
+    @NotBlank(message = "Phone number is required")
     private String phone;
-    private String email;
+    @NotBlank(message = "Address is required")
     private String address;
 }

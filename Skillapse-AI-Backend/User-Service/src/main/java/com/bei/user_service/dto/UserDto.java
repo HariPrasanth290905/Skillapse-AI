@@ -1,5 +1,8 @@
 package com.bei.user_service.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,20 +15,21 @@ import java.util.UUID;
 @ToString
 @Builder
 public class UserDto {
-    private UUID id;              // always needed to identify the user
-
-    private String createdAt;
-    // Header fields
+    @NotBlank(message = "Username is required")
+    private String username;
+    @NotBlank(message = "Password is required")
+    private String password;
+    @Email(message = "Invalid Email")
+    @NotBlank(message = "Email is required")
+    private String email;
+    @NotBlank(message = "Enter your full name")
     private String fullName;
+    @NotBlank(message = "Enter your position")
     private String position;
-    private Integer experience;
-
-    // Contact fields
+    @NotNull(message = "Contact cannot be null")
     private ContactDTO contact;
 
-    // About section
-    private String aboutMe;
+    private Integer experience;
 
-    // Profile pic etc.
-    // private String profilePicUrl;
+    public String aboutMe;
 }

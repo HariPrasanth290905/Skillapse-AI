@@ -1,6 +1,7 @@
 package com.bei.user_service.controller;
 
 import com.bei.user_service.dto.Otp;
+import com.bei.user_service.dto.UserDto;
 import com.bei.user_service.model.BeiUsers;
 import com.bei.user_service.dto.LoginRequest;
 import com.bei.user_service.service.JwtService;
@@ -24,9 +25,9 @@ public class AuthenticationController {
     JwtService jwtService;
 
     @PostMapping("/signUp")
-    ResponseEntity<?> signup(@RequestBody BeiUsers beiUsers) {
+    ResponseEntity<?> signup(@RequestBody UserDto users) {
         try {
-            return new ResponseEntity<>(userService.addUser(beiUsers), HttpStatus.CREATED);
+            return new ResponseEntity<>(userService.addUser(users), HttpStatus.CREATED);
         }
         catch (Exception ex){
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);

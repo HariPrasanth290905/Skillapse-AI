@@ -1,6 +1,5 @@
 package com.bei.user_service.impl;
 
-import com.bei.user_service.dto.ContactDTO;
 import com.bei.user_service.dto.UserDto;
 import com.bei.user_service.model.BeiUsers;
 import com.bei.user_service.dto.LoginRequest;
@@ -9,6 +8,7 @@ import com.bei.user_service.repo.UserRepo;
 import com.bei.user_service.service.RedisService;
 import com.bei.user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,8 +17,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+
+import static com.bei.user_service.mapper.Mapper.mapToContactDto;
+import static com.bei.user_service.mapper.Mapper.mapToDto;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -36,36 +38,28 @@ public class UserServiceImpl implements UserService {
     @Autowired
     RedisService redisService;
 
-    public BeiUsers addUser(BeiUsers beiUsers) {
-        if (beiUsers == null) {
-            throw new IllegalArgumentException("User cannot be null");
+
+    @Override
+    public UserDto addUser(UserDto user) {
+        if (userRepo.findByUsernameCaseSensitive(user.getUsername()).isPresent() ||
+                userRepo.findByEmail(user.getEmail()) != null) {
+            throw new IllegalArgumentException("User already exists");
         }
-        if (beiUsers.getUsername() == null || beiUsers.getUsername().isBlank()) {
-            throw new IllegalArgumentException("Username is required");
-        }
-        if (beiUsers.getEmail() == null || beiUsers.getEmail().isBlank()) {
-            throw new IllegalArgumentException("Email is required");
-        }
-        if (beiUsers.getPassword() == null || beiUsers.getPassword().isBlank()) {
-            throw new IllegalArgumentException("Password is required");
-        }
-        beiUsers.setPassword(new BCryptPasswordEncoder(12).encode(beiUsers.getPassword()));
-        if (beiUsers.getRole() == null || beiUsers.getRole().isBlank()) {
-            beiUsers.setRole("ROLE_USER");
-        }
-        return userRepo.save(beiUsers);
+
+        BeiUsers beiUser = mapToDto(user);
+        beiUser.getContact().setUser(beiUser);
+        userRepo.save(beiUser);
+        return user;
     }
 
     @Override
     @Transactional
     public UserDto updateUser(UserDto updatedUser) {
-        if (updatedUser == null || updatedUser.getId() == null) {
+        if (updatedUser == null ) {
             throw new IllegalArgumentException("User id cannot be null");
         }
 
-        BeiUsers user = userRepo.findById(updatedUser.getId())
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + updatedUser.getId()));
-
+        BeiUsers user = userRepo.findByEmail(updatedUser.getEmail());
         if (updatedUser.getFullName() != null && !updatedUser.getFullName().isBlank()) {
             user.setFullName(updatedUser.getFullName());
         }
@@ -84,11 +78,7 @@ public class UserServiceImpl implements UserService {
             if (updatedUser.getContact().getAddress() != null && !updatedUser.getContact().getAddress().isBlank()) {
                 contact.setAddress(updatedUser.getContact().getAddress());
             }
-            if (updatedUser.getContact().getEmail() != null && !updatedUser.getContact().getEmail().isBlank()) {
-                contact.setEmail(updatedUser.getContact().getEmail());
-                // Keep user email in sync when provided
-                user.setEmail(updatedUser.getContact().getEmail());
-            }
+
             user.setContact(contact);
         }
         if (updatedUser.getExperience() != null) {
@@ -99,30 +89,10 @@ public class UserServiceImpl implements UserService {
         }
         BeiUsers saved = userRepo.save(user);
 
-        return mapToDto(saved);
+//        return mapToDto(saved);
+        return null;
     }
 
-
-    private UserDto mapToDto(BeiUsers user) {
-        return UserDto.builder()
-                .id(user.getId())
-                .createdAt(user.getCreatedAt() != null ? user.getCreatedAt().toString() : null)
-                .fullName(user.getFullName())
-                .position(user.getPosition())
-                .experience(user.getExperience())
-                .aboutMe(user.getAboutMe())
-                .contact(user.getContact() != null ? mapToContactDto(user.getContact()) : null)
-                .build();
-    }
-
-    private ContactDTO mapToContactDto(Contact contact) {
-        return ContactDTO.builder()
-                .id(contact.getId())
-                .phone(contact.getPhone())
-                .email(contact.getEmail())
-                .address(contact.getAddress())
-                .build();
-    }
 
 
     @Override
@@ -134,15 +104,11 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 
         return UserDto.builder()
-                .id(user.getId())
                 .aboutMe(user.getAboutMe())
-                .contact(mapToContactDto(user.getContact()))
+//                .contact(mapToContactDto(user.getContact()))
                 .fullName(user.getFullName())
                 .position(user.getPosition())
                 .experience(user.getExperience())
-                .createdAt(user.getCreatedAt()
-                        .format(DateTimeFormatter.ofPattern("MMMM yyyy")))
-//                .profilePicUrl(user.getProfilePicUrl())
                 .build();
     }
 
@@ -172,6 +138,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+
+    //Delete all users
     @Override
     public void deleteAllUsers() {
         userRepo.deleteAll();

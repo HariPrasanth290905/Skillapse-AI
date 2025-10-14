@@ -7,7 +7,7 @@ import com.bei.user_service.dto.LoginRequest;
 import java.util.UUID;
 
 public interface UserService {
-    BeiUsers addUser(BeiUsers beiUsers);
+    UserDto addUser(UserDto beiUsers);
     UserDto updateUser(UserDto payload);
     UserDto getUser(String username);
     void deleteUser(UUID id);

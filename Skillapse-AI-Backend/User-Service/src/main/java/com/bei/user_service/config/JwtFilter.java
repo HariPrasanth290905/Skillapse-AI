@@ -1,6 +1,6 @@
 package com.bei.user_service.config;
 
-import com.bei.user_service.service.BeiUsersDetailsService;
+import com.bei.user_service.service.UsersDetailsService;
 import com.bei.user_service.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -46,7 +46,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         System.out.println("token: " + token + " username: " + username);
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = context.getBean(BeiUsersDetailsService.class).loadUserByUsername(username);
+            UserDetails userDetails = context.getBean(UsersDetailsService.class).loadUserByUsername(username);
             if (jwtService.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource()
