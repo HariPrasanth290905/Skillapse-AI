@@ -1,26 +1,24 @@
 package com.irah.skillsservice.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Data
+@Builder
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class Skills {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer skillId;
+    private Long id;
 
-    @NotBlank(message = "Skill must not be empty")
+    @Column(length = 50, nullable = false)
     private String skillName;
 
-    @NotBlank(message = "User must not be empty")
+    @Column(length = 50, nullable = false)
     private String userName;
 
 

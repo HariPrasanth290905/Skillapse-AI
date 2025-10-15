@@ -15,10 +15,6 @@ public interface SkillRepository extends JpaRepository<Skills, Integer> {
 
     Optional<Skills> findByUserNameAndSkillName(String username, String skillName);
 
-    Optional<Skills> findBySkillIdAndUserName(Integer skillId, String username);
-
-    Optional<Skills> findBySkillId(Integer skillId);
-
     @Query("SELECT DISTINCT s.userName FROM Skills s WHERE s.skillName IN :skills AND s.userName <> :currentUser")
     List<String> findDistinctUsersBySkillsExcept(@Param("skills") List<String> skills,
                                                  @Param("currentUser") String currentUser);

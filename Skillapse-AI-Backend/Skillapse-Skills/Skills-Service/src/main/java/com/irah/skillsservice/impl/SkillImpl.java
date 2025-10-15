@@ -2,7 +2,7 @@ package com.irah.skillsservice.impl;
 
 import com.irah.skillsservice.exceptionhandler.SkillAlreadyExistsException;
 import com.irah.skillsservice.exceptionhandler.SkillNotFoundException;
-import com.irah.skillsservice.inter.SkillService;
+import com.irah.skillsservice.service.SkillService;
 import com.irah.skillsservice.model.Skills;
 import com.irah.skillsservice.repository.SkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,29 +18,22 @@ public class SkillImpl implements SkillService {
     private SkillRepository skillRepository;
 
     @Override
-    public Skills addSkill(String username, Skills skill) {
-        Optional<Skills> existingSkill = skillRepository.findByUserNameAndSkillName(username, skill.getSkillName());
+    public Skills addSkill(String username, String skill) {
+        Optional<Skills> existingSkill = skillRepository.findByUserNameAndSkillName(username, skill);
 
         if (existingSkill.isPresent()) {
             throw new SkillAlreadyExistsException("Skill already exists for user: " + username);
         }
-
-        skill.setUserName(username);
-        return skillRepository.save(skill);
+        return skillRepository.save(
+                Skills.builder()
+                        .skillName(skill)
+                        .userName(username)
+                        .build());
     }
 
     @Override
-    public Skills updateSkill(String username, Integer skillId, Skills updatedSkill) {
-        Skills skill = skillRepository.findBySkillIdAndUserName(skillId, username)
-                .orElseThrow(() -> new SkillNotFoundException("Skill not found or unauthorized access"));
-
-        skill.setSkillName(updatedSkill.getSkillName());
-        return skillRepository.save(skill);
-    }
-
-    @Override
-    public void removeSkill(String username, Integer skillId) {
-        Skills skill = skillRepository.findBySkillIdAndUserName(skillId, username)
+    public void removeSkill(String username, String skillName) {
+        Skills skill = skillRepository.findByUserNameAndSkillName(username, skillName)
                 .orElseThrow(() -> new SkillNotFoundException("Skill not found or unauthorized access"));
 
         skillRepository.delete(skill);
@@ -49,13 +42,10 @@ public class SkillImpl implements SkillService {
 
     @Override
     public List<Skills> getSkillsByUserName(String username) {
-        return skillRepository.findSkillsByUserName(username);
+
+        return skillRepository.findSkillsByUserName(username).isEmpty() ? List.of() : skillRepository.findSkillsByUserName(username);
     }
 
-    @Override
-    public List<Skills> getAllSkills() {
-        return skillRepository.findAll();
-    }
 
     @Override
     public List<String> getMatchedUsers(String username) {

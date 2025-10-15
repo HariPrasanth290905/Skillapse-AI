@@ -5,5 +5,9 @@ spring:
   config:
     import: optional:configserver:http://localhost:8070/
 
+# Disable only the default user/password generation
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+
 server:
   port: 8071

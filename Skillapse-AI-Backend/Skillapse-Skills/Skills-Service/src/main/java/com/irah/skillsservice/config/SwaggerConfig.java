@@ -11,7 +11,7 @@ public class SwaggerConfig {
     public GroupedOpenApi userServiceApi() {
         return GroupedOpenApi.builder()
                 .group("user-service")
-                .packagesToScan("com.irah.skillsservice")
+                .packagesToScan("com.irah.skillsservice.controller")
                 .build();
     }
 }

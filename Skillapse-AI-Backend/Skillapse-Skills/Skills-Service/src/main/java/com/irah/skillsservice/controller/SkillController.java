@@ -1,9 +1,9 @@
 package com.irah.skillsservice.controller;
 
-import com.irah.skillsservice.impl.SkillImpl;
-import com.irah.skillsservice.inter.SkillService;
+import com.irah.skillsservice.service.SkillService;
 import com.irah.skillsservice.model.Skills;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -26,24 +26,21 @@ public class SkillController {
         return "Welcome to Skill Service";
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<Skills> addSkill(@RequestAttribute("username") String username, @Valid @RequestBody Skills skill) {
+    @PostMapping("/add/{skill}")
+    public ResponseEntity<Skills> addSkill(@RequestAttribute("username") String username,
+                                           @NotBlank(message = "Skill should not be empty")
+                                           @PathVariable("skill") String skill)
+    {
 
         return ResponseEntity.ok(skillService.addSkill(username, skill));
     }
 
 
-    @PutMapping("/update/{skillId}")
-    public ResponseEntity<Skills> updateSkill(@RequestAttribute("userEmail") String userEmail, @PathVariable Integer skillId, @Valid @RequestBody Skills uSkill) {
+    @DeleteMapping("/remove/{skill}")
+    public ResponseEntity<String> removeSkill(@RequestAttribute("username") String username,
+                                              @PathVariable("skill") String skill) {
 
-        return ResponseEntity.ok(skillService.updateSkill(userEmail, skillId, uSkill));
-    }
-
-
-    @DeleteMapping("/remove/{skillId}")
-    public ResponseEntity<String> removeSkill(@RequestAttribute("userEmail") String userEmail, @PathVariable Integer skillId) {
-
-        skillService.removeSkill(userEmail, skillId);
+        skillService.removeSkill(username, skill);
         return ResponseEntity.ok("Skill removed successfully");
     }
 
@@ -55,14 +52,9 @@ public class SkillController {
     }
 
     @GetMapping("/allSkills")
-    public ResponseEntity<List<Skills>> getUserSkills(@RequestAttribute("userEmail") String userEmail) {
-        System.out.println("userEmail: " + userEmail);
-        return ResponseEntity.ok(skillService.getSkillsByUserName(userEmail));
-    }
-
-    @GetMapping("/getSkills")
-    public ResponseEntity<List<Skills>> getAllSkills() {
-        return ResponseEntity.ok(skillService.getAllSkills());
+    public ResponseEntity<List<Skills>> getUserSkills(@RequestAttribute("username") String username) {
+        System.out.println("userEmail: " + username);
+        return ResponseEntity.ok(skillService.getSkillsByUserName(username));
     }
 
     @GetMapping("/match")
