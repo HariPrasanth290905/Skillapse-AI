@@ -20,6 +20,7 @@ public class Skills {
     @NotBlank(message = "Skill must not be empty")
     private String skillName;
 
+    @NotBlank(message = "User must not be empty")
     private String userName;
 
 

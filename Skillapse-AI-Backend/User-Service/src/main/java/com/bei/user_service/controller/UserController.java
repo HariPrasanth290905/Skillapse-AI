@@ -1,15 +1,19 @@
 package com.bei.user_service.controller;
 
+import com.bei.user_service.dto.UpdateDTO;
 import com.bei.user_service.dto.UserDto;
 import com.bei.user_service.model.BeiUsers;
 
 import com.bei.user_service.service.UserService;
+import jakarta.validation.Valid;
+import jakarta.websocket.Decoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/user")
@@ -29,14 +33,10 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    ResponseEntity<?> updateUser(@RequestBody UserDto users){
+    ResponseEntity<?> updateUser(@RequestBody UpdateDTO users){
         System.out.println("users: " + users);
-        try {
-            return new ResponseEntity<>(userService.updateUser(users), HttpStatus.OK);
-        }
-        catch (Exception ex){
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        return new ResponseEntity<>(userService.updateUser(users), HttpStatus.OK);
+
     }
 
     @PreAuthorize( "hasRole('ADMIN')")
@@ -48,11 +48,16 @@ public class UserController {
 
 
 
-    @GetMapping("/getUser")
-    ResponseEntity<?> getUserByUsername(Authentication authentication) {
-        String username = authentication.getName();
-        UserDto user = userService.getUser(username);
+    @GetMapping("/getUser/{uuid}")
+    ResponseEntity<?> getUserById(@PathVariable("uuid") UUID uuid) {
+        UserDto user = userService.getUser(uuid);
         return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{uuid}")
+    ResponseEntity<?> deleteUserById(@PathVariable("uuid") UUID uuid) {
+        userService.deleteUser(uuid);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

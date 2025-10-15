@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Skill-Service
+    name: Skill-Service-Config
 
   cloud:
     config:

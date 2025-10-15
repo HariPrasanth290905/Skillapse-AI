@@ -1,29 +1,9 @@
 spring:
   application:
-    name: SKILLS-SERVICE
+    name: skills-service
 
-  #DATABASE PROPERTIES
-  datasource:
-    username: root
-    password: izel2002
-    url: jdbc:mysql://localhost:3306/skillapse_skills
-  jpa:
-    hibernate:
-      ddl-auto: update
-
-  #ADMIN-SERVER REGISTER
-  boot:
-    admin:
-      client:
-        url: 'http://localhost:1111'
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-
-secret.key: lQ/septmqpU+XgqEQA8KirEJsEVJOdH65fBVCQbMY+A=
+  config:
+    import: optional:configserver:http://localhost:8070/
 
 server:
-  port: 8082
+  port: 8071

@@ -1,5 +1,6 @@
 package com.bei.user_service.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,17 +11,20 @@ import lombok.ToString;
 
 import java.util.UUID;
 
+
 @Getter
 @Setter
 @ToString
 @Builder
 public class UserDto {
+    private UUID userId;
     @NotBlank(message = "Username is required")
     private String username;
     @NotBlank(message = "Password is required")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-    @Email(message = "Invalid Email")
     @NotBlank(message = "Email is required")
+    @Email(message = "Invalid Email")
     private String email;
     @NotBlank(message = "Enter your full name")
     private String fullName;

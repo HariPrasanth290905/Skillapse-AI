@@ -1,18 +1,15 @@
 package com.bei.user_service.service;
 
+import com.bei.user_service.dto.UpdateDTO;
 import com.bei.user_service.dto.UserDto;
 import com.bei.user_service.model.BeiUsers;
-import com.bei.user_service.dto.LoginRequest;
 
 import java.util.UUID;
 
 public interface UserService {
-    UserDto addUser(UserDto beiUsers);
-    UserDto updateUser(UserDto payload);
-    UserDto getUser(String username);
+    UpdateDTO updateUser(UpdateDTO payload);
+    UserDto getUser(UUID userid);
     void deleteUser(UUID id);
-    String login(LoginRequest loginRequest);
     void deleteAllUsers();
-    String verifyEmail(String email);
-    boolean verifyOTP(String OTP,String email);
+
 }

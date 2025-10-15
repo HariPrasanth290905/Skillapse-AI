@@ -3,7 +3,6 @@ package com.bei.user_service.service;
 import com.bei.user_service.model.BeiUsers;
 import com.bei.user_service.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,14 +22,15 @@ public class UsersDetailsService implements UserDetailsService {
 
         BeiUsers user = userRepo.findByUsernameCaseSensitive(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
-        System.out.println("User " + user);
-        return new User(
-                user.getUsername(),
-                user.getPassword(),
-                user.isActive(),
-                true,
-                true,
-                !user.isAccountLocked(),
-                Collections.singleton(new SimpleGrantedAuthority(user.getRole())));
+        System.out.println("found");
+
+        return User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .disabled(user.isActive())
+                .accountLocked(user.isAccountLocked())
+                .authorities(user.getRole())
+                .build();
+
     }
 }

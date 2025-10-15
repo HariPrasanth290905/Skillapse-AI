@@ -2,10 +2,11 @@ package com.bei.user_service.controller;
 
 import com.bei.user_service.dto.Otp;
 import com.bei.user_service.dto.UserDto;
-import com.bei.user_service.model.BeiUsers;
 import com.bei.user_service.dto.LoginRequest;
+import com.bei.user_service.service.AuthService;
 import com.bei.user_service.service.JwtService;
 import com.bei.user_service.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,36 +20,31 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
 
     @Autowired
-    UserService userService;
-
-    @Autowired
     JwtService jwtService;
 
+    @Autowired
+    AuthService authService;
+
     @PostMapping("/signUp")
-    ResponseEntity<?> signup(@RequestBody UserDto users) {
+    ResponseEntity<?> signup(@Valid @RequestBody UserDto users) {
         try {
-            return new ResponseEntity<>(userService.addUser(users), HttpStatus.CREATED);
+            return new ResponseEntity<>(authService.addUser(users), HttpStatus.CREATED);
         }
         catch (Exception ex){
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
     @PostMapping("/signIn")
-    ResponseEntity<String> signin(@RequestBody LoginRequest loginRequest) {
+    ResponseEntity<String> signin(@Valid @RequestBody LoginRequest loginRequest) {
         System.out.println("login request: " + loginRequest);
-        try {
-            return new ResponseEntity<>(userService.login(loginRequest), HttpStatus.OK);
-        }
-        catch (Exception ex){
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+            return new ResponseEntity<>(authService.login(loginRequest), HttpStatus.OK);
     }
 
     @PostMapping("/verifyOtp")
     ResponseEntity<?> verifyOTP(@RequestBody Otp otp) {
         
         try{
-            boolean verified = userService.verifyOTP(otp.getOtp(), otp.getEmail());
+            boolean verified = authService.verifyOTP(otp.getOtp(), otp.getEmail());
             if (!verified) {
                 return new ResponseEntity<>("Invalid OTP", HttpStatus.BAD_REQUEST);
             }
