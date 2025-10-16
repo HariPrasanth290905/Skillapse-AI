@@ -4,7 +4,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,13 +45,13 @@ protected void doFilterInternal(HttpServletRequest request, HttpServletResponse 
     if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
         try {
             Claims claims = jwtService.validateToken(token);
-            String username = claims.getSubject();
+            String userid = claims.getSubject();
 
-            request.setAttribute("username", username);
+            request.setAttribute("userid", userid);
 
 
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(username, null, List.of());
+                    new UsernamePasswordAuthenticationToken(userid, null, List.of());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);

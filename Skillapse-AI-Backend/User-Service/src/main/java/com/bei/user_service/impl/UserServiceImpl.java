@@ -18,9 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.bei.user_service.mapper.Mapper.mapToContactDto;
-import static com.bei.user_service.mapper.Mapper.mapToDto;
-
 @Service
 public class UserServiceImpl implements UserService {
 

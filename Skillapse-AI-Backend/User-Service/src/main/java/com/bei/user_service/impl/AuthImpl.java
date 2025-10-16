@@ -7,6 +7,7 @@ import com.bei.user_service.repo.UserRepo;
 import com.bei.user_service.service.AuthService;
 import com.bei.user_service.service.JwtService;
 import com.bei.user_service.service.RedisService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -15,6 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import javax.security.auth.login.LoginException;
 
 import static com.bei.user_service.mapper.Mapper.mapToDto;
 
@@ -52,7 +55,7 @@ public class AuthImpl implements AuthService {
     }
 
     @Override
-    public String login(LoginRequest loginRequest) {
+    public String login(LoginRequest loginRequest, HttpServletRequest request) throws LoginException {
         try {
             Authentication authentication = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -62,10 +65,20 @@ public class AuthImpl implements AuthService {
 
             BeiUsers user = userRepo.findByUsernameCaseSensitive(loginRequest.getUsername())
                     .orElseThrow(() -> new RuntimeException("User not found with username: " + loginRequest.getUsername()));
-            return jwtService.generateToken(user.getUsername());
+            String token = jwtService.generateToken(user.getId());
+            user.setLastLoginAt(java.time.LocalDateTime.now());
+
+            String clientIp = request.getHeader("X-Forwarded-For");
+
+            if (clientIp == null || clientIp.isEmpty() || "unknown".equalsIgnoreCase(clientIp)) {
+                clientIp = request.getRemoteAddr();
+            }
+            user.setLastLoginIp(clientIp);
+            userRepo.save(user);
+            return token;
 
         } catch (Exception ex) {
-            throw new RuntimeException(ex.getMessage());
+            throw new LoginException(ex.getMessage());
         }
     }
 

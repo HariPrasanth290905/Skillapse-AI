@@ -2,11 +2,8 @@ package com.bei.user_service.controller;
 
 import com.bei.user_service.dto.UpdateDTO;
 import com.bei.user_service.dto.UserDto;
-import com.bei.user_service.model.BeiUsers;
 
 import com.bei.user_service.service.UserService;
-import jakarta.validation.Valid;
-import jakarta.websocket.Decoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

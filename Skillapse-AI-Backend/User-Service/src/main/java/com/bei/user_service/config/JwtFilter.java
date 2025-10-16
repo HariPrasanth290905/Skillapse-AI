@@ -1,5 +1,6 @@
 package com.bei.user_service.config;
 
+import com.bei.user_service.service.BeiUserDetails;
 import com.bei.user_service.service.UsersDetailsService;
 import com.bei.user_service.service.JwtService;
 import io.jsonwebtoken.JwtException;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -34,24 +36,26 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
         String token = null;
-        String username = null;
+        String uuid = null;
 
         String authorization = request.getHeader("Authorization");
 
         if (authorization != null && authorization.startsWith("Bearer ")) {
             token = authorization.substring(7);
             try {
-                username = jwtService.extractUserName(token);
+                uuid = jwtService.extractUserID(token);
             } catch (Exception e) {
                 System.out.println("Invalid JWT: " + e.getMessage());
             }
         }
 
-        System.out.println("token: " + token + " username: " + username);
+        System.out.println("token: " + token + " username: " + uuid);
         try{
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = context.getBean(UsersDetailsService.class).loadUserByUsername(username);
+            if (uuid != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                BeiUserDetails userDetails = (BeiUserDetails) context.getBean(UsersDetailsService.class).
+                        loadUserById(UUID.fromString(uuid));
                 if (jwtService.validateToken(token, userDetails)) {
+
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource()
                             .buildDetails(request));

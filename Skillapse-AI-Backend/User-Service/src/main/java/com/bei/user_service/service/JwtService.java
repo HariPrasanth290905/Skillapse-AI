@@ -9,10 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -22,14 +19,14 @@ public class JwtService {
     @Value("${secret.key}")
     private String SECRET_KEY;
 
-    public String generateToken(String username) {
-        System.out.println("Generating token for user: " + username);
+    public String generateToken(UUID uuid) {
+        System.out.println("Generating token for user: " + uuid);
         Map<String, Object> claims = new HashMap<>();
 
         return Jwts.builder()
                 .claims()
                 .add(claims)
-                .subject(username)
+                .subject(uuid.toString())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7)) //1week
                 .and()
@@ -42,8 +39,8 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
-    //get username
-    public String extractUserName(String token) {
+    //get userid
+    public String extractUserID(String token) {
         return extractClaim(token, Claims::getSubject);
     }
     //extract claim
@@ -60,9 +57,10 @@ public class JwtService {
                 .getPayload();
     }
     //token validator
-    public boolean validateToken(String token, UserDetails userDetails) {
-        final String userName = extractUserName(token);
-        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public boolean validateToken(String token, BeiUserDetails userDetails) {
+        final String userId = extractUserID(token);
+        return (userDetails.getId().equals(UUID.fromString(userId))
+        &&!isTokenExpired(token));
     }
     //expiry check
     private boolean isTokenExpired(String token) {

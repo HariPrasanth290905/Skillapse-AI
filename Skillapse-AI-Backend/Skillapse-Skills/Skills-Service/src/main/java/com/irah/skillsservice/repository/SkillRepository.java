@@ -8,17 +8,18 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface SkillRepository extends JpaRepository<Skills, Integer> {
-    List<Skills> findSkillsByUserName(String username);
+    List<Skills> findSkillsById(UUID id);
 
-    Optional<Skills> findByUserNameAndSkillName(String username, String skillName);
 
-    @Query("SELECT DISTINCT s.userName FROM Skills s WHERE s.skillName IN :skills AND s.userName <> :currentUser")
+    @Query("SELECT DISTINCT s.id FROM Skills s WHERE s.skillName IN :skills AND s.id <> :currentUser")
     List<String> findDistinctUsersBySkillsExcept(@Param("skills") List<String> skills,
                                                  @Param("currentUser") String currentUser);
 
+    Optional<Skills> findByIdAndSkillName(UUID id, String skillName);
 }
 
 

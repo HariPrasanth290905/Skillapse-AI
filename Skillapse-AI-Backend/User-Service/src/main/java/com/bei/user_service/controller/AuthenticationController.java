@@ -6,6 +6,7 @@ import com.bei.user_service.dto.LoginRequest;
 import com.bei.user_service.service.AuthService;
 import com.bei.user_service.service.JwtService;
 import com.bei.user_service.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.security.auth.login.LoginException;
 
 @RestController
 @RequestMapping("/auth")
@@ -35,9 +38,9 @@ public class AuthenticationController {
         }
     }
     @PostMapping("/signIn")
-    ResponseEntity<String> signin(@Valid @RequestBody LoginRequest loginRequest) {
+    ResponseEntity<String> signin(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) throws LoginException {
         System.out.println("login request: " + loginRequest);
-            return new ResponseEntity<>(authService.login(loginRequest), HttpStatus.OK);
+            return new ResponseEntity<>(authService.login(loginRequest,request), HttpStatus.OK);
     }
 
     @PostMapping("/verifyOtp")
@@ -49,7 +52,7 @@ public class AuthenticationController {
                 return new ResponseEntity<>("Invalid OTP", HttpStatus.BAD_REQUEST);
             }
 
-            return new ResponseEntity<>(jwtService.generateToken(otp.getUsername()), HttpStatus.OK);
+            return new ResponseEntity<>(jwtService.generateToken(otp.getId()), HttpStatus.OK);
         }
         catch (Exception ex){
             System.out.println("Exception: " + ex.getMessage());

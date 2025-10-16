@@ -1,4 +1,4 @@
-package com.irah.skillsservice.exceptionhandler;
+package com.irah.skillsservice.customexception;
 
 
 public class SkillNotFoundException extends RuntimeException {
