@@ -1,5 +1,5 @@
 import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } from "react-router-dom";
-import Master from "./pages/Master";
+import Master from "./routes/Master";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Signin from "./pages/Signin/Signin";
 import VerifyOtp from "./pages/Verify/VerifyOtp";

@@ -4,9 +4,9 @@ import Progressbar from "../../../Components/Progressbar";
 
 function Analytics() {
 
-  const [activeUsers, setActiveUsers] = useState(0);
-  const [rating, setRating] = useState(0)
-  const [efficiency, setEfficiency] = useState(0);
+  const [activeUsers, _setActiveUsers] = useState(0);
+  const [rating, _setRating] = useState(0)
+  const [efficiency, _setEfficiency] = useState(0);
 
   return (
     <section id="analytics">

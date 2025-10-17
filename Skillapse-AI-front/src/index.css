@@ -245,11 +245,11 @@ body {
     @apply flex flex-col justify-center items-center gap-4 sm:gap-5 w-full sm:w-10/12;
   }
 
-  .up-enter > div {
+  .up-enter div {
     @apply flex flex-col gap-3 sm:gap-4 w-full;
   }
 
-  .up-enter > div input {
+  .up-enter div input {
     @apply border border-gray-400 rounded-2xl py-2 sm:py-3 px-3 w-full;
   }
 

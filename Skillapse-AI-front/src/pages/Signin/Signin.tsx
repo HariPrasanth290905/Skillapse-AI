@@ -1,38 +1,45 @@
-import axios from "axios";
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+
+import { z } from 'zod'
+import { useForm, type SubmitHandler } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { loginRequest } from "@/api/Profile";
 
 function Signin() {
-  const location = useLocation() as { state?: { from?: { pathname?: string; search?: string } } };
-  const [user, setUser] = useState({
-    username: "",
-    password: "",
+
+  const signIn = z.object({
+    username: z.string()
+      .min(4, "Username must be atleast 4 characters")
+      .max(20, "Username should not exceed 20 characters"),
+    password: z.string()
+      .min(6, "Password must be at least 6 characters")
+      .max(50, "Password too long"),
+  })
+
+  type SignInForm = z.infer<typeof signIn>
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    resolver: zodResolver(signIn),
+    defaultValues: {
+      username: "",
+      password: ""
+    }
   });
 
-  const navigate = useNavigate();
-
-  const handleSignin = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log(user);
-    e.preventDefault();
-    axios
-      .post("http://localhost:8080/auth/signIn", user)
-      .then((res) => {
-        console.log(res.data);
-        navigate("/verifyOtp", {
-          replace: true,
-          state: { email: res.data, username: user.username, from: location.state?.from },
-        });
+  const handleSignIn: SubmitHandler<SignInForm> = async (data) => {
+    try {
+      const token: string = await loginRequest({
+        username: data.username,
+        password: data.password
       })
-      .catch((err) => {
-        console.error(err);
-        // Show error to user
-      });
-  };
-
-  // Google login
-  const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/google";
-  };
+      sessionStorage.setItem("accessToken", token)
+    } catch (error: unknown) {
+      console.error('Sign in failed', error)
+    }
+  }
 
   return (
     <div id="signin">
@@ -43,37 +50,33 @@ function Signin() {
           <p>Sign in to continue</p>
         </div>
 
-        {/* Google login */}
-        <div className="cursor-pointer" onClick={handleGoogleLogin}>
-          Google
-        </div>
-
-        {/* Traditional login */}
-        <form className="up-enter" onSubmit={handleSignin}>
+        <form className="up-enter" onSubmit={handleSubmit(handleSignIn)}>
           <div>
             <label htmlFor="username">Username</label>
             <input
               type="text"
-              id="username"
-              name="username"
-              value={user.username}
-              onChange={(e) => setUser({ ...user, username: e.target.value })}
+              placeholder="Enter your username"
+              {...register("username")}
             />
+            {errors.username?.message &&
+              <span className="text-red-500">{errors.username.message}</span>}
           </div>
           <div>
             <label htmlFor="password">Password</label>
             <input
               type="password"
-              id="password"
-              name="password"
-              value={user.password}
-              onChange={(e) => setUser({ ...user, password: e.target.value })}
+              placeholder="Enter your password"
+              {...register("password")}
             />
+            {errors.password?.message &&
+              <span className="text-red-500">{errors.password.message}</span>}
           </div>
 
           <button className="myButton" type="submit">
             Sign In
           </button>
+          {errors.root?.message &&
+            <span className='text-red-500'>{errors.root.message}</span>}
         </form>
         <div className="sign-foot">
           <a href="#" className="sign-wrap">
