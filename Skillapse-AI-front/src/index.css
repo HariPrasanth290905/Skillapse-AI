@@ -1,8 +1,30 @@
 @import "tailwindcss";
 
-html,
-body {
-  @apply w-full bg-black text-white scroll-smooth overflow-x-hidden;
+@layer base {
+  html,
+  body {
+    @apply w-full bg-black text-white scroll-smooth overflow-scroll;
+  }
+
+  body::-webkit-scrollbar {
+    display: none;
+  }
+  div::-webkit-scrollbar {
+    display: none;
+  }
+  form::-webkit-scrollbar {
+    display: none;
+  }
+}
+@layer utilities {
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px rgb(0 0 0 / 1) inset !important;
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
 }
 
 @layer components {
@@ -17,6 +39,17 @@ body {
 
   .dash-content h1 {
     @apply text-2xl font-extrabold;
+  }
+
+  /* grouped muted text color to reduce repetition */
+  .flex-center > i,
+  #welcome p,
+  #cards div p,
+  .core-list span,
+  .a-match span,
+  .rates div:first-child span,
+  .rates div:nth-child(2) span {
+    @apply text-gray-400;
   }
 
   /* Navbar */
@@ -44,13 +77,9 @@ body {
     @apply flex flex-col gap-0 items-end;
   }
 
-  .flex-center > i {
-    @apply text-gray-400;
-  }
-
   /* Not Found */
   .not-found {
-    @apply flex justify-center items-center h-screen w-full;
+    @apply flex justify-center items-center h-screen w-1/2 mx-auto;
   }
 
   /* Welcome Section */
@@ -73,7 +102,7 @@ body {
   }
 
   #welcome p {
-    @apply text-center text-base sm:text-[1.25rem] text-gray-400 sm:w-10/12;
+    @apply text-center text-base sm:text-[1.25rem] sm:w-10/12;
   }
   #welcome div {
     @apply flex items-center gap-3 sm:gap-5;
@@ -81,7 +110,6 @@ body {
   /* Bot Icon */
   #welcome .bot {
     @apply text-pink-500;
-    
   }
 
   #welcome button {
@@ -108,7 +136,7 @@ body {
   }
 
   #cards div p {
-    @apply text-base sm:text-lg text-gray-400;
+    @apply text-base sm:text-lg;
   }
 
   /* Core section */
@@ -131,9 +159,6 @@ body {
   .core-list h3 {
     @apply text-lg sm:text-xl;
   }
-  .core-list span {
-    @apply text-gray-400;
-  }
 
   /* Core right */
   #analytics {
@@ -151,9 +176,6 @@ body {
   .a-match h1 {
     @apply text-4xl sm:text-5xl font-bold text-pink-500;
   }
-  .a-match span {
-    @apply text-gray-400;
-  }
 
   /* Rates Analytics */
   .rates {
@@ -162,17 +184,11 @@ body {
   .rates div {
     @apply flex flex-col items-center;
   }
-  .rates div:first-child h1 {
-    @apply text-3xl sm:text-4xl font-bold text-sky-500;
-  }
-  .rates div:first-child span {
-    @apply text-gray-400;
+  .rates div:first-child h1{
+      @apply text-3xl sm:text-4xl font-bold text-sky-500;
   }
   .rates div:nth-child(2) h1 {
     @apply text-3xl sm:text-4xl font-bold text-purple-500;
-  }
-  .rates div:nth-child(2) span {
-    @apply text-gray-400;
   }
 
   /* Progress efficiency */
@@ -216,13 +232,18 @@ body {
   }
 
   /* Sign in  */
-  #signin {
-    @apply flex justify-center items-center h-screen w-full px-4;
+  #sign {
+    @apply grid place-items-center h-screen w-full px-4;
   }
 
-  /* Signin Box  */
+  /* Sign Box  */
   .box {
-    @apply flex flex-col justify-center items-center h-auto w-full sm:max-w-[60%] lg:max-w-[40%] rounded-3xl border border-gray-400 p-6 sm:p-10 lg:p-20 overflow-hidden object-cover;
+    @apply flex flex-col justify-center items-center
+         w-full max-w-full
+         sm:max-w-[80%] md:max-w-[60%] lg:max-w-[40%]
+         rounded-3xl border border-gray-400
+         p-16 md:p-8 lg:p-4 h-4/5
+         overflow-y-scroll scroll-smooth;
   }
 
   .box .header {
@@ -233,11 +254,11 @@ body {
     @apply w-[30%] sm:w-[25%] rounded-full border-t-4 border-b-4 border-t-pink-500 border-b-sky-500;
   }
 
-  #signin h1 {
+  #sign h1 {
     @apply font-bold text-2xl sm:text-3xl lg:text-4xl;
   }
 
-  #signin p {
+  #sign p {
     @apply text-gray-400 text-sm sm:text-base;
   }
 
@@ -245,16 +266,14 @@ body {
     @apply flex flex-col justify-center items-center gap-4 sm:gap-5 w-full sm:w-10/12;
   }
 
-  .up-enter div {
-    @apply flex flex-col gap-3 sm:gap-4 w-full;
+  input {
+    @apply border border-gray-400 rounded-md sm:py-3 w-full h-12 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500;
   }
-
-  .up-enter div input {
-    @apply border border-gray-400 rounded-2xl py-2 sm:py-3 px-3 w-full;
+  .gap {
+    @apply grid gap-2;
   }
-
-  .up-enter label {
-    @apply text-base sm:text-xl font-semibold;
+  label {
+    @apply text-base sm:text-lg;
   }
 
   .myButton {
