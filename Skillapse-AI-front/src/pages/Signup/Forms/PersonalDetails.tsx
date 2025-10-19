@@ -1,7 +1,7 @@
 import {useForm, type SubmitHandler} from "react-hook-form";
 import {formFields} from "../formfields";
 import {zodResolver} from "@hookform/resolvers/zod";
-import type z from "zod";
+import {z} from "zod";
 import {useNavigate} from "react-router-dom";
 import {useSignupStore} from "@/pages/Signup/store.ts";
 import {useEffect} from "react";
@@ -16,33 +16,28 @@ const personalDetailsSchema = formFields.pick({
 function PersonalDetails() {
 
     const navigate = useNavigate();
-
-    const username = useSignupStore((state)=>state.username);
-    const password = useSignupStore((state)=>state.password);
-    const email = useSignupStore((state)=>state.email);
-
-    const setData = useSignupStore((state) => state.setData);
+    const store = useSignupStore();
 
     const {register, handleSubmit, formState: {errors}} = useForm({
         resolver: zodResolver(personalDetailsSchema),
         defaultValues: {
-            firstName: '',
-            lastName: '',
-            position: '',
-            experience: ''
+            firstName: store.firstName || '',
+            lastName: store.lastName || '',
+            position: store.position || '',
+            experience:store.experience || ''
         }
     })
     const onSubmit: SubmitHandler<z.infer<typeof personalDetailsSchema>> = (data) => {
-        setData(data)
+        store.setData(data)
         navigate('/form/contactdetails')
     }
 
     useEffect(() => {
-            if (!username || !password || !email) {
+            if (!store.username || !store.password || !store.email) {
                 navigate('/form/userdetails')
             }
         },
-        [username, password, email, navigate, ])
+        [store.username,store.password,store.email, navigate])
     return (
         <section id="sign">
             <div className="box">

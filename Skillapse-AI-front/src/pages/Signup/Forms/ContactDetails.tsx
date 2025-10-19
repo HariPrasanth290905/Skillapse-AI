@@ -1,10 +1,11 @@
 import {useForm, type SubmitHandler} from "react-hook-form";
 import {formFields} from "../formfields";
 import {zodResolver} from "@hookform/resolvers/zod";
-import type z from "zod";
+import {z} from "zod";
 import {useNavigate} from "react-router-dom";
 import {useSignupStore} from "@/pages/Signup/store.ts";
 import {useEffect} from "react";
+import {signUpRequest} from "@/api/Profile.tsx";
 
 const contactDetailsSchema = formFields.pick({
     contact: true,
@@ -13,23 +14,12 @@ const contactDetailsSchema = formFields.pick({
 
 function ContactDetails() {
     const navigate = useNavigate();
-
-    // firstName: '',
-    //     lastName: '',
-    //     position: '',
-
-    const firstname = useSignupStore((state) => state.firstName);
-    const lastname = useSignupStore((state) => state.lastName);
-    const position = useSignupStore((state) => state.position);
-    const experience = useSignupStore((state) => state.experience);
-    const username = useSignupStore((state) => state.username);
-    const email = useSignupStore((state) => state.email);
-    const password = useSignupStore((state) => state.password);
+    const store = useSignupStore();
 
     const {register, handleSubmit, formState: {errors}} = useForm({
         resolver: zodResolver(contactDetailsSchema),
         defaultValues: {
-            contact: {
+            contact: store.contact || {
                 address: {
                     city: '',
                     country: '',
@@ -38,31 +28,57 @@ function ContactDetails() {
                     postalCode: '',
                     state: ''
                 },
-                phone: ""
+                phone: ''
             },
-            aboutMe: '',
+            aboutMe: store.aboutMe || '',
         }
     });
 
     const onSubmit: SubmitHandler<z.infer<typeof contactDetailsSchema>> = (data) => {
-        console.log('Data', {
-            ...data,
-            firstname,
-            lastname,
-            position,
-            experience,
-            username,
-            email,
-            password,
-        });
 
+        const fullName = `${store.firstName || ''} ${store.lastName || ''}`.trim();
+        const fullAddress = [
+            data.contact.address.line1,
+            data.contact.address.line2,
+            data.contact.address.city,
+            data.contact.address.state,
+            data.contact.address.postalCode,
+            data.contact.address.country
+        ].filter(Boolean).join(', ');
+
+        const userDto = {
+            username: store.username,
+            password: store.password,
+            email: store.email,
+            fullName: fullName,
+            position: store.position,
+            contact: {
+                phone: data.contact.phone,
+                address: fullAddress
+            },
+            experience: store.experience ? parseInt(store.experience) : undefined,
+            aboutMe: data.aboutMe
+        };
+        try {
+            signUpRequest(userDto).then(response => {
+                if (response.status === 201) {
+                    navigate('/')
+                } else {
+                    throw new Error('Sign up failed', response.data)
+                }
+            })
+        }
+        catch (error: unknown) {
+            console.error(error)
+        }
+        localStorage.removeItem('signup-storage');
     }
 
-    useEffect(()=>{
-        if(!firstname || !lastname || !position ){
+    useEffect(() => {
+        if (!store.firstName || !store.position) {
             navigate('/form/personaldetails')
         }
-    },[firstname,lastname,position,navigate])
+    }, [store.firstName, store.position, navigate])
 
     return (
         <section id="sign">

@@ -1,7 +1,7 @@
 import {useForm, type SubmitHandler} from "react-hook-form";
 import {formFields} from "../formfields";
 import {zodResolver} from "@hookform/resolvers/zod";
-import type z from "zod";
+import {z} from "zod";
 import {useNavigate} from "react-router-dom";
 import {useSignupStore} from "@/pages/Signup/store.ts";
 
@@ -14,19 +14,18 @@ const userDetailsSchema = formFields.pick({
 function UserDetails() {
 
     const navigate = useNavigate();
-
-    const setData = useSignupStore((state) => state.setData);
+    const store = useSignupStore();
 
     const {register, handleSubmit, formState: {errors}} = useForm({
         resolver: zodResolver(userDetailsSchema),
         defaultValues: {
-            username: '',
-            password: '',
-            email: ''
+            username: store.username || '',
+            password: store.password || '',
+            email: store.email || ''
         }
     })
     const onSubmit: SubmitHandler<z.infer<typeof userDetailsSchema>> = (data) => {
-        setData(data)
+        store.setData(data)
         navigate('/form/personaldetails')
     }
 

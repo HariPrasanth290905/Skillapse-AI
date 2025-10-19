@@ -1,4 +1,4 @@
-import type {formTypes} from "@/pages/Signup/formfields.ts";
+import {type formTypes} from "@/pages/Signup/formfields.ts";
 import {create} from "zustand/react";
 import {createJSONStorage, persist} from "zustand/middleware";
 
@@ -10,9 +10,10 @@ export const useSignupStore = create<SignupState>()(
     persist(
         (set) => ({
             setData: (data) => set(data),
+
         }),
         {
-            name: "onboarding-storage",
+            name: "signup-storage",
             storage: createJSONStorage(() => localStorage),
         }
     )
