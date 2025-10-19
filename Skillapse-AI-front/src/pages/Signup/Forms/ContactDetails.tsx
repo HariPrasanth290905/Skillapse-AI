@@ -2,8 +2,9 @@ import {useForm, type SubmitHandler} from "react-hook-form";
 import {formFields} from "../formfields";
 import {zodResolver} from "@hookform/resolvers/zod";
 import type z from "zod";
-// import {useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {useSignupStore} from "@/pages/Signup/store.ts";
+import {useEffect} from "react";
 
 const contactDetailsSchema = formFields.pick({
     contact: true,
@@ -11,7 +12,11 @@ const contactDetailsSchema = formFields.pick({
 })
 
 function ContactDetails() {
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
+
+    // firstName: '',
+    //     lastName: '',
+    //     position: '',
 
     const firstname = useSignupStore((state) => state.firstName);
     const lastname = useSignupStore((state) => state.lastName);
@@ -52,6 +57,12 @@ function ContactDetails() {
         });
 
     }
+
+    useEffect(()=>{
+        if(!firstname || !lastname || !position ){
+            navigate('/form/personaldetails')
+        }
+    },[firstname,lastname,position,navigate])
 
     return (
         <section id="sign">
